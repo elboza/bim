@@ -6,7 +6,7 @@
 #ifndef AST_H
 #define AST_H
 
-enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,t_lambda,t_func,t_integer,t_float,t_symbol,t_boolean};
+enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,t_lambda,t_func,t_integer,t_float,t_symbol,t_string,t_boolean};
 
 typedef struct _object{
 	int ltype;
@@ -27,6 +27,7 @@ typedef struct _object{
 #define IS_INTEGER(x) ((x)->type==t_integer)
 #define IS_FLOAT(x)   ((x)->type==t_float)
 #define IS_SYMBOL(x)  ((x)->type==t_symbol)
+#define IS_STRING(x)  ((x)->type==t_string)
 #define IS_BOOLEAN(x) ((x)->type==t_boolean)
 #define IS_CONS(x)    ((x)->ltype==T_CONS)
 #define IS_EMPTY(x)   ((x)->ltype==T_EMPTY_LIST)
@@ -35,6 +36,7 @@ _object* new_object(void);
 _object* new_atom_i(int ival);
 _object* new_atom_f(float fval);
 _object* new_atom_s(char *s);
+_object* new_atom_str(char *s);
 _object* new_atom_b(int ival);
 _object* cons(_object *first,_object *last);
 _object* new_fn(_object *(*fn)(_object *, _object*));

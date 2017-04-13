@@ -16,20 +16,19 @@ letter [a-zA-Z_]
 hexletter [a-fA-F]
 comment #
 identifier {letter}({letter}|{digit})*
-filename [0-9a-zA-Z_./]+
 qstring \"[^"\n]*["\n]
 ws [ \t\r]+
 newline \n
 
 %%
 
--?{digit}+	{
+{digit}+	{
 				yylval.int_val = atoi(yytext);
 				//printf("%d\n",yylval.iValue);
 				return INTEGER;
 			}
 			
--?{digit}+\.{digit}+ {yylval.float_val=(float)atof(yytext); return FLOAT;}
+{digit}+\.{digit}+ {yylval.float_val=(float)atof(yytext); return FLOAT;}
 
 0x({digit}|{hexletter})+	{
 				sscanf(yytext+2, "%X", &lang_mx);
@@ -41,13 +40,14 @@ newline \n
 "defmacro"	return DEFMACRO;
 "let"		return LET;
 "exit"		return QUIT;
+"quit"		return QUIT;
 "prn"		return PRN;
 "#t"		return TT;
 "#f"		return NIL;
 ":t"		return TYPE;
 
 
-[-()<>%+@*/;,{}.$!"\[\]:\\='?~] {
+[-()<>%+@*/;,{}.$!"\[\]:\\='?~|&] {
 				return *yytext;
 			}
 
@@ -58,11 +58,6 @@ newline \n
 				yylval.s_val=strdup(yytext);
 				//printf("internal word=%s %s\n",yytext,yylval);
 				return WORD;
-			}
-{filename}	{
-				yylval.s_val=strdup(yytext);
-				//printf("file type is=%s %s\n",yytext,yylval);
-                return FILENAME;
 			}
 {qstring}	{ 
 				yylval.s_val = strdup(yytext+1); 
