@@ -29,7 +29,7 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING
 %token QUIT DEFUN DEFMACRO LET PRN TT NIL TYPE
-%type <obj> number object sexpr fn sexprlist symbol expr op boolean string func_application func_args
+%type <obj> number object sexpr fn sexprlist symbol expr op boolean string func_application func_args blockcode
 //<int_val> expr
 //%left EQ
 %left '+' '-'
@@ -53,6 +53,7 @@ sexpr: fn {$$=$1;} | object {$$=$1;}
 
 fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|LET symbol '=' expr						{$$=cons(new_atom_s("assign"),cons($2,cons($4,the_empty_list())));}
+		|symbol '=' expr {$$=cons(new_atom_s("assign"),cons($1,cons($3,the_empty_list())));}
 		|PRN expr					{$$=cons(new_atom_s("prn"),cons($2,the_empty_list()));}
 		|PRN WORD						{$$=cons(new_atom_s("prn"),cons(new_atom_s($2),the_empty_list()));}
 		|PRN STRING						{$$=cons(new_atom_s("prn"),cons(new_atom_str($2),the_empty_list()));}
@@ -62,13 +63,16 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|TYPE STRING						{printf("string\n");$$=NULL;}
 		|TYPE boolean					{printf("boolean\n");$$=NULL;}
 		|TYPE symbol					{printf("symbol\n");$$=NULL;}
+		|blockcode {$$=$1;}
+		| {$$=NULL;}
+
+blockcode: '{' sexprlist '}' {$$=cons(new_atom_s("progn"),cons($2,the_empty_list()));}
 
 expr:	expr op expr	{$$=cons($2,cons($1,cons($3,the_empty_list())));}
 	|'(' expr ')'	{$$=$2;}
 	| number		{$$=$1;}
 	| '-' expr		{$$=cons(new_atom_s("neg"),cons($2,the_empty_list()));}
 	| func_application {$$=$1;}
-	|	{$$=NULL;}
 
 op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}
 
