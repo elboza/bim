@@ -27,9 +27,9 @@ void yyerror(struct _object **ast,char *s);
 
 %token <int_val> INTEGER
 %token <float_val> FLOAT
-%token <s_val> WORD STRING
+%token <s_val> WORD STRING STRING2
 %token QUIT DEFUN DEFMACRO LET PRN TT NIL TYPE
-%type <obj> number object sexpr fn sexprlist symbol expr op boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem
+%type <obj> number object sexpr fn sexprlist symbol expr op boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker
 //<int_val> expr
 //%left EQ
 %left '+' '-'
@@ -71,7 +71,7 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|blockcode {$$=$1;}
 		| {$$=NULL;}
 
-blockcode: '{' sexprlist '}' {$$=cons(new_atom_s("progn"),cons($2,the_empty_list()));}
+blockcode: '{' sexprlist '}' {$$=cons(new_atom_s("progn"),$2);}
 
 expr:	expr op expr	{$$=cons($2,cons($1,cons($3,the_empty_list())));}
 	|'(' expr ')'	{$$=$2;}
@@ -79,6 +79,8 @@ expr:	expr op expr	{$$=cons($2,cons($1,cons($3,the_empty_list())));}
 	| '-' expr		{$$=cons(new_atom_s("neg"),cons($2,the_empty_list()));}
 	| func_application {$$=$1;}
 	| symbol {$$=$1;}
+	| symbol '[' listpicker ']' {$$=cons(new_atom_s("get_list"),cons($3,cons($1,the_empty_list())));}
+	| symbol '[' hashpicker ']' {$$=cons(new_atom_s("get_hash"),cons($3,cons($1,the_empty_list())));}
 
 op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}
 
@@ -109,14 +111,24 @@ listitems: object {$$=cons($1,the_empty_list());}
 
 hash: '{' hashitems '}' {$$=cons(new_atom_s("hash"),$2);}
 
-hashitem: symbol '@' object {$$=cons($1,cons($3,the_empty_list()));}
+hashitem: string ':' object {$$=cons($1,cons($3,the_empty_list()));}
 
 hashitems: hashitem {$$=cons($1,the_empty_list());}
 	|hashitem ',' hashitems {$$=cons($1,$3);}
 
+listpicker:
+	expr {$$=$1;}
+	|expr ':' expr {$$=cons(new_atom_s("list_range"),cons($1,cons($3,the_empty_list())));}
+	| ':' expr {$$=cons(new_atom_s("list_range"),cons(new_atom_i(0),cons($2,the_empty_list())));}
+	| expr ':' {$$=cons(new_atom_s("list_range"),cons($1,cons(new_atom_s("lastlist"),the_empty_list())));}
+
+hashpicker:
+	string {$$=$1;}
+
 symbol: WORD						{$$=new_atom_s($1);}
 
 string: STRING {$$=new_atom_str($1);}
+	|STRING2 {$$=new_atom_str2($1);}
 
 boolean:	TT							{$$=new_atom_b(1);}
 		|NIL							{$$=new_atom_b(0);}

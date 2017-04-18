@@ -17,6 +17,7 @@ hexletter [a-fA-F]
 comment #
 identifier {letter}({letter}|{digit})*
 qstring \"[^"\n]*["\n]
+qstring2 \'[^'\n]*['\n]
 ws [ \t\r]+
 newline \n
 
@@ -66,6 +67,14 @@ newline \n
 				else 
 				yylval.s_val[yyleng-2] = 0;
 				return STRING;
+			}
+{qstring2}	{ 
+				yylval.s_val = strdup(yytext+1); 
+				if (yylval.s_val[yyleng-2] != 0x27) 
+				;//die("improperly terminated string"); 
+				else 
+				yylval.s_val[yyleng-2] = 0;
+				return STRING2;
 			}
 {comment}	{
 			//printf("comment:");

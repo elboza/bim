@@ -61,6 +61,15 @@ _object* new_atom_str(char *s){
 	obj->sval=strdup(s);
 	return obj;
 }
+_object* new_atom_str2(char *s){
+	_object *obj;
+	obj=new_object();
+	if(!obj) return NULL;
+	obj->ltype=T_ATOM;
+	obj->type=t_string2;
+	obj->sval=strdup(s);
+	return obj;
+}
 _object* cons(_object *first,_object *last){
 	_object *obj;
 	obj=new_object();
@@ -101,6 +110,9 @@ void print_atom(_object *obj){
 			break;
 		case t_string:
 			printf("\"%s\"",obj->sval);
+			break;
+		case t_string2:
+			printf("'%s'",obj->sval);
 			break;
 		case t_boolean:
 			obj->ival? printf("T"):printf("NIL");
