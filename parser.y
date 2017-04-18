@@ -120,7 +120,7 @@ listpicker:
 	expr {$$=$1;}
 	|expr ':' expr {$$=cons(new_atom_s("list_range"),cons($1,cons($3,the_empty_list())));}
 	| ':' expr {$$=cons(new_atom_s("list_range"),cons(new_atom_i(0),cons($2,the_empty_list())));}
-	| expr ':' {$$=cons(new_atom_s("list_range"),cons($1,cons(new_atom_s("lastlist"),the_empty_list())));}
+	| expr ':' {$$=cons(new_atom_s("list_range"),cons($1,cons(new_atom_i(-1),the_empty_list())));}
 
 hashpicker:
 	string {$$=$1;}
