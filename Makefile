@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-ggdb
+CFLAGS=-ggdb -Wall -std=gnu99
 LIBS=-lreadline -lm -lfl
 SRC=src
 OBJECTS= main.o repl.o ast.o environment.o 

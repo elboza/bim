@@ -39,7 +39,7 @@ void usage_b()
 }
 void parse_args(int argc,char **argv,struct m_action *action)
 {
-	char *s1;
+	//char *s1;
 	int c;
 	action->shell=0;
 	action->file=0;
@@ -86,7 +86,7 @@ void parse_args(int argc,char **argv,struct m_action *action)
 int main(int argc,char **argv)
 {
 	struct m_action action;
-	char filename[FILENAME_LEN];
+	//char filename[FILENAME_LEN];
 	parse_args(argc,argv,&action);
 	
 	
