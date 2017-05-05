@@ -28,12 +28,18 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT IF WHILE LET PRN TT NIL TYPE
+%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER
 %type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr MAYBEELSE
 //<int_val> expr
 //%left EQ
+%right ELSE
+%left AND OR
+%left '<' '>' EQ NEQ LE GE
+%precedence NOT
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%' REMINDER
+%left '&' '|' rot_l rot_r shift_l shift_r b_xor
+%right POW
 %precedence NEG
 //%right '='
 
@@ -44,7 +50,7 @@ void yyerror(struct _object **ast,char *s);
 lisp:	sexprlist {*ast=$1;YYACCEPT;}
 
 object:	/*symbol {$$=$1;}
-		|*/boolean {$$=$1;}
+		|*/bexpr {$$=$1;}
 		|expr {$$=$1;}
 		|string {$$=$1;}
 		|lambda {$$=$1;}
@@ -64,9 +70,7 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("set_list"),cons($3,cons($1,cons($6,the_empty_list()))));}
 		|LET symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("set_hash"),cons($4,cons($2,cons($7,the_empty_list()))));}
 		|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("set_hash"),cons($3,cons($1,cons($6,the_empty_list()))));}
-		|PRN expr					{$$=cons(new_atom_s("prn"),cons($2,the_empty_list()));}
-		|PRN WORD						{$$=cons(new_atom_s("prn"),cons(new_atom_s($2),the_empty_list()));}
-		|PRN STRING						{$$=cons(new_atom_s("prn"),cons(new_atom_str($2),the_empty_list()));}
+		|PRN sexpr					{$$=cons(new_atom_s("prn"),cons($2,the_empty_list()));}
 		|TYPE INTEGER					{printf("integer\n");$$=NULL;}
 		|TYPE FLOAT						{printf("float\n");$$=NULL;}
 		|TYPE WORD						{printf("word\n");$$=NULL;}
@@ -87,6 +91,16 @@ expr:	number		{$$=$1;}
 	|expr '-' expr	{$$=cons(new_atom_s("sub"),cons($1,cons($3,the_empty_list())));}
 	|expr '*' expr	{$$=cons(new_atom_s("mul"),cons($1,cons($3,the_empty_list())));}
 	|expr '/' expr	{$$=cons(new_atom_s("div"),cons($1,cons($3,the_empty_list())));}
+	|expr '%' expr	{$$=cons(new_atom_s("mod"),cons($1,cons($3,the_empty_list())));}
+	|expr REMINDER expr	{$$=cons(new_atom_s("reminder"),cons($1,cons($3,the_empty_list())));}
+	|expr '&' expr	{$$=cons(new_atom_s("b_and"),cons($1,cons($3,the_empty_list())));}
+	|expr '|' expr	{$$=cons(new_atom_s("b_or"),cons($1,cons($3,the_empty_list())));}
+	|expr b_xor expr	{$$=cons(new_atom_s("b_xor"),cons($1,cons($3,the_empty_list())));}
+	|expr rot_l expr	{$$=cons(new_atom_s("rot_l"),cons($1,cons($3,the_empty_list())));}
+	|expr rot_r expr	{$$=cons(new_atom_s("rot_r"),cons($1,cons($3,the_empty_list())));}
+	|expr shift_l expr	{$$=cons(new_atom_s("shift_l"),cons($1,cons($3,the_empty_list())));}
+	|expr shift_r expr	{$$=cons(new_atom_s("shift_r"),cons($1,cons($3,the_empty_list())));}
+	|expr POW expr	{$$=cons(new_atom_s("pow"),cons($1,cons($3,the_empty_list())));}
 	|'(' expr ')'	{$$=$2;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("neg"),cons($2,the_empty_list()));}
 	| func_application {$$=$1;}
@@ -95,9 +109,22 @@ expr:	number		{$$=$1;}
 
 /*op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}*/
 
-bexpr: WORD {$$=cons(new_atom_s("bexpr"),the_empty_list());}
+bexpr: boolean {$$=cons($1,the_empty_list());}
+	/*|expr {$$=$1;}*/
+	|bexpr AND bexpr {$$=cons(new_atom_s("and"),cons($1,cons($3,the_empty_list())));}
+	|bexpr OR bexpr {$$=cons(new_atom_s("or"),cons($1,cons($3,the_empty_list())));}
+	|expr '<' expr {$$=cons(new_atom_s("lt"),cons($1,cons($3,the_empty_list())));}
+	|expr '>' expr {$$=cons(new_atom_s("gt"),cons($1,cons($3,the_empty_list())));}
+	|expr LE expr {$$=cons(new_atom_s("le"),cons($1,cons($3,the_empty_list())));}
+	|expr GE expr {$$=cons(new_atom_s("ge"),cons($1,cons($3,the_empty_list())));}
+	|expr EQ expr {$$=cons(new_atom_s("eq"),cons($1,cons($3,the_empty_list())));}
+	|expr NEQ expr {$$=cons(new_atom_s("neq"),cons($1,cons($3,the_empty_list())));}
+	|bexpr EQ bexpr {$$=cons(new_atom_s("eq"),cons($1,cons($3,the_empty_list())));}
+	|bexpr NEQ bexpr {$$=cons(new_atom_s("neq"),cons($1,cons($3,the_empty_list())));}
+	|'!' bexpr  %prec NOT {$$=cons(new_atom_s("not"),cons($2,the_empty_list()));}
 
-MAYBEELSE: sexpr {$$=$1;}
+MAYBEELSE: ELSE sexpr {$$=$2;}
+	|';' ELSE sexpr {$$=$3;}|{$$=the_empty_list();}
 
 number:	INTEGER							{$$=new_atom_i($1);}
 		|FLOAT							{$$=new_atom_f($1);}
@@ -141,6 +168,7 @@ hashpicker:
 	string {$$=$1;}
 
 symbol: WORD						{$$=new_atom_s($1);}
+	|'^' WORD {$$=cons(new_atom_s("global"),cons(new_atom_s($2),the_empty_list()));}
 
 string: STRING {$$=new_atom_str($1);}
 	|STRING2 {$$=new_atom_str2($1);}

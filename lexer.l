@@ -46,9 +46,23 @@ newline \n
 ":t"		return TYPE;
 "if"		return IF;
 "while"		return WHILE;
+"else"		return ELSE;
+"^^"		return POW;
+"&&"		return AND;
+"||"		return OR;
+"=="		return EQ;
+"!="		return NEQ;
+"<="		return LE;
+">="		return GE;
+"^|^"		return b_xor;
+"<<"		return shift_l;
+">>"		return shift_r;
+"<<<"		return rot_l;
+">>>"		return rot_r;
+"%%"		return REMINDER;
 
 
-[-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£] {
+[-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£^] {
 				return *yytext;
 			}
 
