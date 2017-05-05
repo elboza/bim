@@ -37,8 +37,6 @@ newline \n
 				return INTEGER;
 			}
 
-"defun"		return DEFUN;
-"defmacro"	return DEFMACRO;
 "let"		return LET;
 "exit"		return QUIT;
 "quit"		return QUIT;
@@ -46,6 +44,8 @@ newline \n
 "#t"		return TT;
 "#f"		return NIL;
 ":t"		return TYPE;
+"if"		return IF;
+"while"		return WHILE;
 
 
 [-()<>%+@*/;,{}.$!"\[\]:\\='?~|&] {

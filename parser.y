@@ -28,8 +28,8 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT DEFUN DEFMACRO LET PRN TT NIL TYPE
-%type <obj> number object sexpr fn sexprlist symbol expr op boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker
+%token QUIT IF WHILE LET PRN TT NIL TYPE
+%type <obj> number object sexpr fn sexprlist symbol expr op boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr MAYBEELSE
 //<int_val> expr
 //%left EQ
 %left '+' '-'
@@ -68,8 +68,9 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|TYPE STRING						{printf("string\n");$$=NULL;}
 		|TYPE boolean					{printf("boolean\n");$$=NULL;}
 		|TYPE symbol					{printf("symbol\n");$$=NULL;}
+		|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("if"),cons($3,cons($5,cons($6,the_empty_list()))));}
 		|blockcode {$$=$1;}
-		| {$$=NULL;}
+		| {$$=the_empty_list();}
 
 blockcode: '{' sexprlist '}' {$$=cons(new_atom_s("progn"),$2);}
 
@@ -83,6 +84,10 @@ expr:	expr op expr	{$$=cons($2,cons($1,cons($3,the_empty_list())));}
 	| symbol '[' hashpicker ']' {$$=cons(new_atom_s("get_hash"),cons($3,cons($1,the_empty_list())));}
 
 op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}
+
+bexpr: WORD {$$=cons(new_atom_s("bexpr"),the_empty_list());}
+
+MAYBEELSE: sexpr {$$=$1;}
 
 number:	INTEGER							{$$=new_atom_i($1);}
 		|FLOAT							{$$=new_atom_f($1);}
@@ -98,7 +103,7 @@ LAMBDA_PARAMS:
 LAMBDA_BODY:
 	sexpr {$$=$1;}
 
-func_application: WORD '(' func_args ')' {$$=cons(new_atom_s("apply"),cons(new_atom_s($1),$3));}
+func_application: WORD '(' func_args ')' {/*$$=cons(new_atom_s("apply"),cons(new_atom_s($1),$3));*/$$=cons(new_atom_s($1),$3);}
 
 func_args: expr {$$=cons($1,the_empty_list());}
 	|expr ',' func_args {$$=cons($1,$3);}
