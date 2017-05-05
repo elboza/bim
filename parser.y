@@ -34,7 +34,8 @@ void yyerror(struct _object **ast,char *s);
 //%left EQ
 %left '+' '-'
 %left '*' '/'
-//%right '-'
+%precedence NEG
+//%right '='
 
 %start lisp
 %parse-param{struct _object **ast}
@@ -42,8 +43,8 @@ void yyerror(struct _object **ast,char *s);
 
 lisp:	sexprlist {*ast=$1;YYACCEPT;}
 
-object:	symbol {$$=$1;}
-		|boolean {$$=$1;}
+object:	/*symbol {$$=$1;}
+		|*/boolean {$$=$1;}
 		|expr {$$=$1;}
 		|string {$$=$1;}
 		|lambda {$$=$1;}
@@ -59,6 +60,10 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|symbol '=' object {$$=cons(new_atom_s("assign"),cons($1,cons($3,the_empty_list())));}
 		|LET symbol ':' object						{$$=cons(new_atom_s("assign"),cons($2,cons($4,the_empty_list())));}
 		|symbol ':' object						{$$=cons(new_atom_s("assign"),cons($1,cons($3,the_empty_list())));}
+		|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("set_list"),cons($4,cons($2,cons($7,the_empty_list()))));}
+		|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("set_list"),cons($3,cons($1,cons($6,the_empty_list()))));}
+		|LET symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("set_hash"),cons($4,cons($2,cons($7,the_empty_list()))));}
+		|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("set_hash"),cons($3,cons($1,cons($6,the_empty_list()))));}
 		|PRN expr					{$$=cons(new_atom_s("prn"),cons($2,the_empty_list()));}
 		|PRN WORD						{$$=cons(new_atom_s("prn"),cons(new_atom_s($2),the_empty_list()));}
 		|PRN STRING						{$$=cons(new_atom_s("prn"),cons(new_atom_str($2),the_empty_list()));}
@@ -69,6 +74,7 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|TYPE boolean					{printf("boolean\n");$$=NULL;}
 		|TYPE symbol					{printf("symbol\n");$$=NULL;}
 		|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("if"),cons($3,cons($5,cons($6,the_empty_list()))));}
+		|WHILE '(' bexpr ')' sexpr {$$=cons(new_atom_s("while"),cons($3,cons($5,the_empty_list())));}
 		|blockcode {$$=$1;}
 		| {$$=the_empty_list();}
 
@@ -77,9 +83,9 @@ blockcode: '{' sexprlist '}' {$$=cons(new_atom_s("progn"),$2);}
 expr:	expr op expr	{$$=cons($2,cons($1,cons($3,the_empty_list())));}
 	|'(' expr ')'	{$$=$2;}
 	| number		{$$=$1;}
-	| '-' expr		{$$=cons(new_atom_s("neg"),cons($2,the_empty_list()));}
-	| func_application {$$=$1;}
 	| symbol {$$=$1;}
+	| '-' expr	%prec NEG	{$$=cons(new_atom_s("neg"),cons($2,the_empty_list()));}
+	| func_application {$$=$1;}
 	| symbol '[' listpicker ']' {$$=cons(new_atom_s("get_list"),cons($3,cons($1,the_empty_list())));}
 	| symbol '[' hashpicker ']' {$$=cons(new_atom_s("get_hash"),cons($3,cons($1,the_empty_list())));}
 

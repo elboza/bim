@@ -14,7 +14,7 @@ unsigned int lang_mx;
 digit [0-9]
 letter [a-zA-Z_]
 hexletter [a-fA-F]
-comment #
+comment \/\/
 identifier {letter}({letter}|{digit})*
 qstring \"[^"\n]*["\n]
 qstring2 \'[^'\n]*['\n]
@@ -48,7 +48,7 @@ newline \n
 "while"		return WHILE;
 
 
-[-()<>%+@*/;,{}.$!"\[\]:\\='?~|&] {
+[-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£] {
 				return *yytext;
 			}
 
