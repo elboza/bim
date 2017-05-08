@@ -29,10 +29,11 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
 %token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr MAYBEELSE
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE
 //<int_val> expr
 //%left EQ
-%right ELSE
+%precedence THEN
+%precedence ELSE
 %left AND OR
 %left '<' '>' EQ NEQ LE GE
 %precedence NOT
@@ -70,7 +71,7 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("set_list"),cons($3,cons($1,cons($6,the_empty_list()))));}
 		|LET symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("set_hash"),cons($4,cons($2,cons($7,the_empty_list()))));}
 		|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("set_hash"),cons($3,cons($1,cons($6,the_empty_list()))));}
-		|PRN sexpr					{$$=cons(new_atom_s("prn"),cons($2,the_empty_list()));}
+		|PRN printlist					{$$=cons(new_atom_s("prn"),cons($2,the_empty_list()));}
 		|TYPE INTEGER					{printf("integer\n");$$=NULL;}
 		|TYPE FLOAT						{printf("float\n");$$=NULL;}
 		|TYPE WORD						{printf("word\n");$$=NULL;}
@@ -123,8 +124,9 @@ bexpr: boolean {$$=cons($1,the_empty_list());}
 	|bexpr NEQ bexpr {$$=cons(new_atom_s("neq"),cons($1,cons($3,the_empty_list())));}
 	|'!' bexpr  %prec NOT {$$=cons(new_atom_s("not"),cons($2,the_empty_list()));}
 
-MAYBEELSE: ELSE sexpr {$$=$2;}
-	|';' ELSE sexpr {$$=$3;}|{$$=the_empty_list();}
+MAYBEELSE: ELSE sexpr %prec ELSE{$$=$2;}
+	|';' ELSE sexpr %prec ELSE{$$=$3;}
+	| %prec THEN{$$=the_empty_list();}
 
 number:	INTEGER							{$$=new_atom_i($1);}
 		|FLOAT							{$$=new_atom_f($1);}
@@ -167,11 +169,15 @@ listpicker:
 hashpicker:
 	string {$$=$1;}
 
+printlist: sexpr {$$=cons($1,the_empty_list());}
+	| sexpr ',' printlist {$$=cons($1,$3);}
+
+
 symbol: WORD						{$$=new_atom_s($1);}
 	|'^' WORD {$$=cons(new_atom_s("global"),cons(new_atom_s($2),the_empty_list()));}
 
-string: STRING {$$=new_atom_str($1);}
-	|STRING2 {$$=new_atom_str2($1);}
+string: STRING {$$=new_atom_str_QQ($1);}
+	|STRING2 {$$=new_atom_str_Q($1);}
 
 boolean:	TT							{$$=new_atom_b(1);}
 		|NIL							{$$=new_atom_b(0);}

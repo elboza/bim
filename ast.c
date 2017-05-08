@@ -11,9 +11,9 @@ _object* new_object(void){
 	_object *obj;
 	obj=(_object*)malloc(sizeof(_object));
 	if(!obj) return NULL;
-	obj->sval=NULL;
-	obj->car=NULL;
-	obj->cdr=NULL;
+	//obj->sval=NULL;
+	obj->data.pair.car=NULL;
+	obj->data.pair.cdr=NULL;
 	return obj;
 }
 _object* new_atom_i(int ival){
@@ -22,7 +22,7 @@ _object* new_atom_i(int ival){
 	if(!obj) return NULL;
 	obj->ltype=T_ATOM;
 	obj->type=t_integer;
-	obj->ival=ival;
+	obj->data.fixnum.value=(long)ival;
 	return obj;
 }
 _object* new_atom_b(int ival){
@@ -31,7 +31,7 @@ _object* new_atom_b(int ival){
 	if(!obj) return NULL;
 	obj->ltype=T_ATOM;
 	obj->type=t_boolean;
-	obj->ival=ival;
+	obj->data.boolean.value=ival;
 	return obj;
 }
 _object* new_atom_f(float fval){
@@ -40,7 +40,7 @@ _object* new_atom_f(float fval){
 	if(!obj) return NULL;
 	obj->ltype=T_ATOM;
 	obj->type=t_float;
-	obj->fval=fval;
+	obj->data.dotted.value=fval;
 	return obj;
 }
 _object* new_atom_s(char *s){
@@ -49,25 +49,25 @@ _object* new_atom_s(char *s){
 	if(!obj) return NULL;
 	obj->ltype=T_ATOM;
 	obj->type=t_symbol;
-	obj->sval=strdup(s);
+	obj->data.symbol.value=strdup(s);
 	return obj;
 }
-_object* new_atom_str(char *s){
+_object* new_atom_str_QQ(char *s){
 	_object *obj;
 	obj=new_object();
 	if(!obj) return NULL;
 	obj->ltype=T_ATOM;
-	obj->type=t_string;
-	obj->sval=strdup(s);
+	obj->type=t_string_qq;
+	obj->data.string.value=strdup(s);
 	return obj;
 }
-_object* new_atom_str2(char *s){
+_object* new_atom_str_Q(char *s){
 	_object *obj;
 	obj=new_object();
 	if(!obj) return NULL;
 	obj->ltype=T_ATOM;
-	obj->type=t_string2;
-	obj->sval=strdup(s);
+	obj->type=t_string_q;
+	obj->data.string.value=strdup(s);
 	return obj;
 }
 _object* cons(_object *first,_object *last){
@@ -75,8 +75,8 @@ _object* cons(_object *first,_object *last){
 	obj=new_object();
 	if(!obj) return NULL;
 	obj->ltype=T_CONS;
-	obj->car=first;
-	obj->cdr=last;
+	obj->data.pair.car=first;
+	obj->data.pair.cdr=last;
 	return obj;
 }
 _object* new_fn(_object *(*fn)(_object *, _object*)){
@@ -84,7 +84,17 @@ _object* new_fn(_object *(*fn)(_object *, _object*)){
 	obj=new_object();
 	if(!obj) return NULL;
 	obj->type=t_func;
-	obj->fn=fn;
+	obj->data.primitive_proc.fn=fn;
+	return obj;
+}
+_object* new_compound_fn(_object *parameters,_object *body,_object *env){
+	_object *obj;
+	obj=new_object();
+	if(!obj) return NULL;
+	obj->type=t_compund_proc;
+	obj->data.compound_proc.parameters=parameters;
+	obj->data.compound_proc.body=body;
+	obj->data.compound_proc.env=env;
 	return obj;
 }
 _object *the_empty_list(void){
@@ -92,30 +102,30 @@ _object *the_empty_list(void){
 	obj=new_object();
 	if(!obj) return NULL;
 	obj->ltype=T_EMPTY_LIST;
-	obj->car=NULL;
-	obj->cdr=NULL;
+	obj->data.pair.car=NULL;
+	obj->data.pair.cdr=NULL;
 	return obj;
 }
 void print_atom(_object *obj){
 	if(!obj) return;
 	switch(obj->type){
 		case t_integer:
-			printf("%d",obj->ival);
+			printf("%ld",obj->data.fixnum.value);
 			break;
 		case t_float:
-			printf("%g",obj->fval);
+			printf("%g",obj->data.dotted.value);
 			break;
 		case t_symbol:
-			printf("%s",obj->sval);
+			printf("%s",obj->data.symbol.value);
 			break;
-		case t_string:
-			printf("\"%s\"",obj->sval);
+		case t_string_qq:
+			printf("\"%s\"",obj->data.string.value);
 			break;
-		case t_string2:
-			printf("'%s'",obj->sval);
+		case t_string_q:
+			printf("'%s'",obj->data.string.value);
 			break;
 		case t_boolean:
-			obj->ival? printf("T"):printf("NIL");
+			obj->data.boolean.value? printf("#t"):printf("#f");
 			break;
 		default:
 			//printf("u?");
@@ -127,12 +137,19 @@ void crlf(void){
 }
 void del_atom(_object *obj){
 	if(obj==NULL) return;
-	if(obj->sval==NULL) return;
-	if(obj->sval) free(obj->sval);
+	if(IS_STRING(obj)){
+		if(obj->data.string.value) free(obj->data.string.value);
+	}
+	if(IS_SYMBOL(obj)){
+		if(obj->data.symbol.value) free(obj->data.symbol.value);
+	}
 	free(obj);
 }
 void del_cascade(_object *obj){
-	
+	if(IS_PAIR(obj)){
+		del_cascade(car(obj));
+		del_cascade(cdr(obj));
+	}
 	del_atom(obj);
 }
 void write_pair(_object *pair){
@@ -184,8 +201,8 @@ void print_debug_ast(_object *ast){
 	}
 }
 _object *car(_object *pair) {
-	return pair->car;
+	return pair->data.pair.car;
 }
 _object *cdr(_object *pair) {
-	return pair->cdr;
+	return pair->data.pair.cdr;
 }

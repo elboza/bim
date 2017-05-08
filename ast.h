@@ -6,30 +6,64 @@
 #ifndef AST_H
 #define AST_H
 
-enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,t_lambda,t_func,t_integer,t_float,t_symbol,t_string,t_string2,t_boolean};
+enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,t_lambda,t_func,t_compund_proc,t_integer,t_float,t_symbol,t_string_qq,t_string_q,t_boolean};
 
 typedef struct _object{
 	int ltype;
 	int type;
-	
-	int ival;
-	float fval;
-	char *sval;
-	
+
+	union{
+		struct {
+			int value;
+		}boolean;
+		struct{
+			long value;
+		}fixnum;
+		struct{
+			float value;
+		}dotted;
+		struct {
+			char *value;
+		} string;
+		struct {
+			char *value;
+		}symbol;
+		struct {
+			char value;
+		}character;
+		struct {
+			//struct _object *(*fn)(struct _object *arguments);
+			struct _object *(*fn)(struct _object *, struct _object*);
+		}primitive_proc;
+		struct {
+			struct _object *parameters;
+			struct _object *body;
+			struct _object *env;
+		}compound_proc;
+		struct {
+			struct _object *car;
+			struct _object *cdr;
+		}pair;
+		struct {
+			//FILE *stream;
+		}input_port;
+		struct {
+			//FILE *stream;
+		}output_port;
+	}data;
 	struct _object *(*fn)(struct _object *, struct _object*);
 	
-	struct _object *car;
-	struct _object *cdr;
 } _object;
 
 #define IS_ATOM(x)    ((x)->ltype==T_ATOM)
 #define IS_LIST(x)    ((x)->ltype==T_LIST)
+#define IS_PAIR(x)    ((x)->ltype==T_LIST)
 #define IS_INTEGER(x) ((x)->type==t_integer)
 #define IS_FLOAT(x)   ((x)->type==t_float)
 #define IS_SYMBOL(x)  ((x)->type==t_symbol)
 #define IS_STRING_QQ(x) ((x)->type==t_string)
 #define IS_STRING2(x)  ((x)->type==t_string2)
-#define IS_STRING(x)  ((x)->type==t_string || (x)->type==t_string2)
+#define IS_STRING(x)  ((x)->type==t_string_qq || (x)->type==t_string_q)
 #define IS_NUMBER(x) ((x)->type==t_integer || (x)->type==t_float)
 #define IS_BOOLEAN(x) ((x)->type==t_boolean)
 #define IS_CONS(x)    ((x)->ltype==T_CONS)
@@ -39,11 +73,12 @@ _object* new_object(void);
 _object* new_atom_i(int ival);
 _object* new_atom_f(float fval);
 _object* new_atom_s(char *s);
-_object* new_atom_str(char *s);
-_object* new_atom_str2(char *s);
+_object* new_atom_str_QQ(char *s);
+_object* new_atom_str_Q(char *s);
 _object* new_atom_b(int ival);
 _object* cons(_object *first,_object *last);
 _object* new_fn(_object *(*fn)(_object *, _object*));
+_object* new_compound_fn(_object *parameters,_object *body,_object *env);
 void print_atom(_object *obj);
 void crlf(void);
 void del_atom(_object *obj);
