@@ -6,7 +6,7 @@
 #ifndef AST_H
 #define AST_H
 
-enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,t_lambda,t_func,t_compund_proc,t_integer,t_float,t_symbol,t_string_qq,t_string_q,t_boolean};
+enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,T_BOTTOM,t_lambda,t_func,t_compund_proc,t_integer,t_float,t_symbol,t_string_qq,t_string_q,t_boolean};
 
 typedef struct _object{
 	int ltype;
@@ -32,8 +32,8 @@ typedef struct _object{
 			char value;
 		}character;
 		struct {
-			//struct _object *(*fn)(struct _object *arguments);
-			struct _object *(*fn)(struct _object *, struct _object*);
+			struct _object *(*fn)(struct _object *arguments);
+			//struct _object *(*fn)(struct _object *, struct _object*);
 		}primitive_proc;
 		struct {
 			struct _object *parameters;
@@ -51,9 +51,7 @@ typedef struct _object{
 			//FILE *stream;
 		}output_port;
 	}data;
-	struct _object *(*fn)(struct _object *, struct _object*);
-	
-} _object;
+} _object,object_t;
 
 #define IS_ATOM(x)    ((x)->ltype==T_ATOM)
 #define IS_LIST(x)    ((x)->ltype==T_LIST)
@@ -68,6 +66,7 @@ typedef struct _object{
 #define IS_BOOLEAN(x) ((x)->type==t_boolean)
 #define IS_CONS(x)    ((x)->ltype==T_CONS)
 #define IS_EMPTY(x)   ((x)->ltype==T_EMPTY_LIST)
+#define IS_BOTTOM(x)  ((x)->ltype==T_BOTTOM)
 
 _object* new_object(void);
 _object* new_atom_i(int ival);
@@ -76,8 +75,9 @@ _object* new_atom_s(char *s);
 _object* new_atom_str_QQ(char *s);
 _object* new_atom_str_Q(char *s);
 _object* new_atom_b(int ival);
+_object* new_atom_bottom(void);
 _object* cons(_object *first,_object *last);
-_object* new_fn(_object *(*fn)(_object *, _object*));
+_object* new_fn(_object *(*fn)(_object *arguments));
 _object* new_compound_fn(_object *parameters,_object *body,_object *env);
 void print_atom(_object *obj);
 void crlf(void);
@@ -87,7 +87,8 @@ void print_ast(_object *ast);
 void print_debug_ast(_object *ast);
 _object *car(_object *pair);
 _object *cdr(_object *pair);
-_object *the_empty_list(void);
+_object *new_empty_list(void);
+int is_the_empty_list(_object *obj);
 
 
 #define caar(obj)   car(car(obj))

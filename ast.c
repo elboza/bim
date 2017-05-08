@@ -79,7 +79,7 @@ _object* cons(_object *first,_object *last){
 	obj->data.pair.cdr=last;
 	return obj;
 }
-_object* new_fn(_object *(*fn)(_object *, _object*)){
+_object* new_fn(_object *(*fn)(_object *arguments)){
 	_object *obj;
 	obj=new_object();
 	if(!obj) return NULL;
@@ -97,11 +97,23 @@ _object* new_compound_fn(_object *parameters,_object *body,_object *env){
 	obj->data.compound_proc.env=env;
 	return obj;
 }
-_object *the_empty_list(void){
+_object *new_empty_list(void){
 	_object *obj;
 	obj=new_object();
 	if(!obj) return NULL;
 	obj->ltype=T_EMPTY_LIST;
+	obj->data.pair.car=NULL;
+	obj->data.pair.cdr=NULL;
+	return obj;
+}
+int is_the_empty_list(_object *obj){
+	return (IS_EMPTY(obj));
+}
+_object* new_atom_bottom(void){
+	_object *obj;
+	obj=new_object();
+	if(!obj) return NULL;
+	obj->ltype=T_BOTTOM;
 	obj->data.pair.car=NULL;
 	obj->data.pair.cdr=NULL;
 	return obj;
@@ -137,6 +149,8 @@ void crlf(void){
 }
 void del_atom(_object *obj){
 	if(obj==NULL) return;
+	//if(is_the_empty_list(obj)) return;
+	//if(IS_BOTTOM(obj)) return;
 	if(IS_STRING(obj)){
 		if(obj->data.string.value) free(obj->data.string.value);
 	}
