@@ -19,10 +19,13 @@ char is_variable(object_t *expression) {
 
 char is_tagged_list(object_t *expression, object_t *tag) {
 	object_t *the_car;
-	
+	if(!tag) return 0;
 	if (is_pair(expression)) {
 		the_car = car(expression);
-		return IS_SYMBOL(the_car) && (the_car == tag);
+        if(IS_SYMBOL(the_car)){
+            if(is_equal_variable(the_car,tag)) return 1;
+        }
+		//return IS_SYMBOL(the_car) && (the_car == tag);
 	}
 	return 0;
 }
@@ -40,7 +43,7 @@ object_t *assignment_value(object_t *exp) {
 }
 
 char is_definition(object_t *exp) {
-	return is_tagged_list(exp, define_symbol);
+	return is_tagged_list(exp, assign_symbol);
 }
 
 object_t *definition_variable(object_t *exp) {

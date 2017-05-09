@@ -1,5 +1,6 @@
 #include<stdlib.h>
 #include<stdio.h>
+#include<string.h>
 #include "ast.h"
 #include "env.h"
 
@@ -8,7 +9,7 @@ object_t *make_symbol(char *value){
 	return new_atom_s(value);
 }
 int is_pair(object_t *obj){
-	return (IS_PAIR(obj));
+	return (IS_PAIR(obj)||IS_CONS(obj));
 }
 void set_car(object_t *obj, object_t *value){
 	obj->data.pair.car = value;
@@ -70,6 +71,12 @@ object_t *make_compound_proc(object_t *parameters, object_t *body, object_t *env
 int is_compound_proc(object_t *obj) {
 	return obj->type == t_compound_proc;
 }
+int is_equal_variable(_object *var1,_object *var2){
+	if(var1->type==t_symbol && var2->type==t_symbol){
+		if(strcmp(var1->data.symbol.value,var2->data.symbol.value)==0) return 1;
+	}
+	return 0;
+}
 object_t *eval_proc(object_t *arguments) {
 	fprintf(stderr, "illegal state: The body of the eval "
 	"primitive procedure should not execute.\n");
@@ -118,10 +125,10 @@ object_t *lookup_variable_value(object_t *var, object_t *env) {
 		vars = frame_variables(frame);
 		vals = frame_values(frame);
 		while (!is_the_empty_list(vars)) {
-			if (var == car(vars)) {
+			if (is_equal_variable(var, car(vars))) {
 				return car(vals);
 			}
-			if(var==cdr(vars)){
+			if(is_equal_variable(var,cdr(vars))){
 				//printf("found &rest param \n");//,cdr(vars)->data.string.value);
 				return cdr(vals);
 			}
@@ -147,7 +154,7 @@ void set_variable_value(object_t *var, object_t *val, object_t *env) {
 		vars = frame_variables(frame);
 		vals = frame_values(frame);
 		while (!is_the_empty_list(vars)) {
-			if (var == car(vars)) {
+			if (is_equal_variable(var, car(vars))) {
 				set_car(vals, val);
 				return;
 			}
@@ -170,7 +177,7 @@ void define_variable(object_t *var, object_t *val, object_t *env) {
 	vals = frame_values(frame);
 
 	while (!is_the_empty_list(vars)) {
-		if (var == car(vars)) {
+		if (is_equal_variable(var, car(vars))) {
 			set_car(vals, val);
 			return;
 		}
@@ -221,7 +228,7 @@ void init_env(void){
 	symbol_table = the_empty_list;
 
 	//make_symbol...
-	//cond_symbol = make_symbol("cond");
+	assign_symbol = make_symbol("assign");
 
 	the_empty_environment = the_empty_list;
 	the_global_environment = make_environment();

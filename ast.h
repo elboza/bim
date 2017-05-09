@@ -122,7 +122,7 @@ int is_true(object_t *obj);
 #define cdddar(obj) cdr(cdr(cdr(car(obj))))
 #define cddddr(obj) cdr(cdr(cdr(cdr(obj))))
 
-//object_t *quote_symbol;
+object_t *assign_symbol;
 object_t *define_symbol;
 object_t *set_symbol;
 object_t *ok_symbol;

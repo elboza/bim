@@ -22,6 +22,7 @@ int is_primitive_proc(object_t *obj);
 object_t *is_procedure_proc(object_t *arguments);
 object_t *make_compound_proc(object_t *parameters, object_t *body, object_t *env);
 int is_compound_proc(object_t *obj);
+int is_equal_variable(_object *var1,_object *var2);
 object_t *eval_proc(object_t *arguments);
 object_t *apply_proc(object_t *arguments);
 char are_number_args(object_t *arguments);
