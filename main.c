@@ -8,6 +8,8 @@
 #include<unistd.h>
 #include<getopt.h>
 #include "repl.h"
+#include "ast.h"
+#include "env.h"
 #include "main.h"
 
 struct m_action{
@@ -87,6 +89,7 @@ int main(int argc,char **argv)
 {
 	struct m_action action;
 	//char filename[FILENAME_LEN];
+	init_env();
 	parse_args(argc,argv,&action);
 	
 	

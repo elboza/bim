@@ -6,7 +6,7 @@
 #ifndef AST_H
 #define AST_H
 
-enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,T_BOTTOM,t_lambda,t_func,t_compund_proc,t_integer,t_float,t_symbol,t_string_qq,t_string_q,t_boolean};
+enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,T_BOTTOM,t_lambda,t_func,t_compound_proc,t_integer,t_float,t_symbol,t_string_qq,t_string_q,t_boolean};
 
 typedef struct _object{
 	int ltype;
@@ -59,8 +59,8 @@ typedef struct _object{
 #define IS_INTEGER(x) ((x)->type==t_integer)
 #define IS_FLOAT(x)   ((x)->type==t_float)
 #define IS_SYMBOL(x)  ((x)->type==t_symbol)
-#define IS_STRING_QQ(x) ((x)->type==t_string)
-#define IS_STRING2(x)  ((x)->type==t_string2)
+#define IS_STRING_QQ(x) ((x)->type==t_string_qq)
+#define IS_STRING_Q(x)  ((x)->type==t_string_q)
 #define IS_STRING(x)  ((x)->type==t_string_qq || (x)->type==t_string_q)
 #define IS_NUMBER(x) ((x)->type==t_integer || (x)->type==t_float)
 #define IS_BOOLEAN(x) ((x)->type==t_boolean)
@@ -89,6 +89,8 @@ _object *car(_object *pair);
 _object *cdr(_object *pair);
 _object *new_empty_list(void);
 int is_the_empty_list(_object *obj);
+int is_false(object_t *obj);
+int is_true(object_t *obj);
 
 
 #define caar(obj)   car(car(obj))
@@ -119,6 +121,27 @@ int is_the_empty_list(_object *obj);
 #define cddadr(obj) cdr(cdr(car(cdr(obj))))
 #define cdddar(obj) cdr(cdr(cdr(car(obj))))
 #define cddddr(obj) cdr(cdr(cdr(cdr(obj))))
+
+//object_t *quote_symbol;
+object_t *define_symbol;
+object_t *set_symbol;
+object_t *ok_symbol;
+object_t *if_symbol;
+object_t *lambda_symbol;
+object_t *begin_symbol;
+object_t *cond_symbol;
+object_t *else_symbol;
+//object_t *let_symbol;
+object_t *and_symbol;
+object_t *or_symbol;
+//object_t *quasiquote_symbol;
+//object_t *unquote_symbol;
+//object_t *unquote_splicing_symbol;
+//object_t *letstar_symbol;
+//object_t *letrec_symbol;
+//object_t *defmacro_symbol;
+//object_t *macroexpand_symbol;
+object_t *eval_symbol;
 
 
 #endif

@@ -47,6 +47,39 @@ char are_float_args(object_t *arguments){
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments)){
 	return new_fn(fn);
 }
+int is_primitive_proc(object_t *obj) {
+	return obj->type == t_func;
+}
+object_t *is_procedure_proc(object_t *arguments) {
+	object_t *obj;
+	
+	obj = car(arguments);
+	return (is_primitive_proc(obj) ||
+	is_compound_proc(obj)) ?
+	true :
+	false;
+}
+object_t *make_compound_proc(object_t *parameters, object_t *body, object_t *env) {
+	object_t *obj;
+	
+	obj = new_compound_fn(parameters,body,env);
+
+	return obj;
+}
+   
+int is_compound_proc(object_t *obj) {
+	return obj->type == t_compound_proc;
+}
+object_t *eval_proc(object_t *arguments) {
+	fprintf(stderr, "illegal state: The body of the eval "
+	"primitive procedure should not execute.\n");
+	exit(1);
+}
+object_t *apply_proc(object_t *arguments) {
+	fprintf(stderr, "illegal state: The body of the apply "
+	"primitive procedure should not execute.\n");
+	exit(1);
+}
 object_t *enclosing_environment(object_t *env) {
 	return cdr(env);
 }

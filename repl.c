@@ -14,6 +14,8 @@
 #endif
 #include "repl.h"
 #include "ast.h"
+#include "env.h"
+#include "eval.h"
 #include "parser.tab.h"
 
 extern int yy_scan_string(char *s);
@@ -79,6 +81,7 @@ void execute(char *s)
 	yylex_destroy();
 	log_d("+");
 	if(x==0 && ast!=NULL){
+		print_atom(run(ast,the_global_environment));
 		log_d("ast ");
 		printf("\n----------------\n");
 		print_ast(ast);

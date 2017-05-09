@@ -6,6 +6,7 @@
 #include<stdio.h>
 #include<string.h>
 #include "ast.h"
+#include "env.h"
 
 _object* new_object(void){
 	_object *obj;
@@ -83,6 +84,7 @@ _object* new_fn(_object *(*fn)(_object *arguments)){
 	_object *obj;
 	obj=new_object();
 	if(!obj) return NULL;
+	obj->ltype=T_LIST;
 	obj->type=t_func;
 	obj->data.primitive_proc.fn=fn;
 	return obj;
@@ -91,7 +93,8 @@ _object* new_compound_fn(_object *parameters,_object *body,_object *env){
 	_object *obj;
 	obj=new_object();
 	if(!obj) return NULL;
-	obj->type=t_compund_proc;
+	obj->ltype=T_LIST;
+	obj->type=t_compound_proc;
 	obj->data.compound_proc.parameters=parameters;
 	obj->data.compound_proc.body=body;
 	obj->data.compound_proc.env=env;
@@ -219,4 +222,10 @@ _object *car(_object *pair) {
 }
 _object *cdr(_object *pair) {
 	return pair->data.pair.cdr;
+}
+int is_false(object_t *obj) {
+	return obj == false;
+}
+int is_true(object_t *obj) {
+	return !is_false(obj);
 }

@@ -18,6 +18,12 @@ object_t *error_proc(object_t *args);
 
 
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments));
+int is_primitive_proc(object_t *obj);
+object_t *is_procedure_proc(object_t *arguments);
+object_t *make_compound_proc(object_t *parameters, object_t *body, object_t *env);
+int is_compound_proc(object_t *obj);
+object_t *eval_proc(object_t *arguments);
+object_t *apply_proc(object_t *arguments);
 char are_number_args(object_t *arguments);
 char are_float_args(object_t *arguments);
 
