@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "env.h"
 #include "eval.h"
+#include "print.h"
 
 char is_self_evaluating(object_t *exp) {
 	return IS_BOOLEAN(exp)   ||

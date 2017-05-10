@@ -3,6 +3,8 @@
 #include<string.h>
 #include "ast.h"
 #include "env.h"
+#include "eval.h"
+#include "print.h"
 
 
 object_t *make_symbol(char *value){
@@ -21,6 +23,30 @@ object_t *error_proc(object_t *args){
 	printf("error !\n");
 	return new_atom_bottom();
 	//return bottom;
+}
+int is_list(object_t *obj){
+	if(is_pair(obj)){
+		if(is_tagged_list(obj,list_symbol)){
+			return 1;
+		}
+	}
+	return 0;
+}
+int is_hash(object_t *obj){
+	if(is_pair(obj)){
+		if(is_tagged_list(obj,hash_symbol)){
+			return 1;
+		}
+	}
+	return 0;
+}
+int is_func(object_t *obj){
+	if(is_pair(obj)){
+		if(is_primitive_proc(obj) || is_compound_proc(obj)){
+			return 1;
+		}
+	}
+	return 0;
 }
 char are_number_args(object_t *arguments){
 	object_t *ptr;
@@ -354,6 +380,9 @@ void init_env(void){
 	lambda_symbol = make_symbol("lambda");
 	begin_symbol = make_symbol("progn");
 	global_symbol = make_symbol("global");
+	list_symbol = make_symbol("list");
+	hash_symbol = make_symbol("hash");
+	ok_symbol = make_symbol("ok");
 
 	the_empty_environment = the_empty_list;
 	the_global_environment = make_environment();
