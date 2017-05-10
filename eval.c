@@ -46,6 +46,10 @@ char is_definition(object_t *exp) {
 	return is_tagged_list(exp, assign_symbol);
 }
 
+int is_global(object_t *exp){
+    return is_tagged_list(exp, global_symbol);
+}
+
 object_t *definition_variable(object_t *exp) {
 	if (IS_SYMBOL(cadr(exp))) {
 		return cadr(exp);
@@ -323,9 +327,20 @@ object_t *eval_assignment(object_t *exp, object_t *env) {
 }
 
 object_t *eval_definition(object_t *exp, object_t *env) {
+    object_t *var;
+    object_t *val;
+    if(is_global(cadr(exp))){
+        var=cadadr(exp);
+        val=caddr(exp);
+        define_variable(var, 
+                    eval(val, env),
+                    the_global_environment);
+    }
+    else{
     define_variable(definition_variable(exp), 
                     eval(definition_value(exp), env),
                     env);
+    }
     return ok_symbol;
 }
 
@@ -340,6 +355,11 @@ tailcall:
     }
     else if (is_variable(exp)) {
         return lookup_variable_value(exp, env);
+    }
+    else if(is_global(exp)){
+        if(is_variable(cadr(exp))){
+            return lookup_variable_value(cadr(exp),the_global_environment);
+        }
     }
     else if (is_assignment(exp)) {
         return eval_assignment(exp, env);

@@ -9,6 +9,7 @@ char is_assignment(object_t *exp);
 object_t *assignment_variable(object_t *exp);
 object_t *assignment_value(object_t *exp);
 char is_definition(object_t *exp);
+int is_global(object_t *exp);
 object_t *definition_variable(object_t *exp);
 object_t *definition_value(object_t *exp);
 object_t *make_if(object_t *predicate, object_t *consequent,object_t *alternative);

@@ -325,6 +325,7 @@ void populate_environment(object_t *env) {
 	add_procedure("div", div_proc);
 	add_procedure("mod", mod_proc);
 	add_procedure("mul", mul_proc);
+	//add_procedure("global", global_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \
 		(cons(new_atom_s((name)), cons(new_fn((func_ptr)), NULL)))
@@ -350,6 +351,9 @@ void init_env(void){
 
 	//make_symbol...
 	assign_symbol = make_symbol("assign");
+	lambda_symbol = make_symbol("lambda");
+	begin_symbol = make_symbol("progn");
+	global_symbol = make_symbol("global");
 
 	the_empty_environment = the_empty_list;
 	the_global_environment = make_environment();

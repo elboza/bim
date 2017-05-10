@@ -131,7 +131,7 @@ object_t *lambda_symbol;
 object_t *begin_symbol;
 object_t *cond_symbol;
 object_t *else_symbol;
-//object_t *let_symbol;
+object_t *global_symbol;
 object_t *and_symbol;
 object_t *or_symbol;
 //object_t *quasiquote_symbol;
