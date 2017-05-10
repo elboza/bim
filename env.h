@@ -27,7 +27,12 @@ object_t *eval_proc(object_t *arguments);
 object_t *apply_proc(object_t *arguments);
 char are_number_args(object_t *arguments);
 char are_float_args(object_t *arguments);
-
+object_t *add_proc(object_t *arguments);
+object_t *sub_proc(object_t *arguments);
+object_t *neg_proc(object_t *arguments);
+object_t *div_proc(object_t *arguments);
+object_t *mod_proc(object_t *arguments);
+object_t *mul_proc(object_t *arguments);
 object_t *enclosing_environment(object_t *env);
 object_t *first_frame(object_t *env);
 object_t *make_frame(object_t *variables, object_t *values);

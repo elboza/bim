@@ -45,6 +45,122 @@ char are_float_args(object_t *arguments){
 	}
 	return 0;
 }
+object_t *add_proc(object_t *arguments) {
+	long result = 0;
+	float fresult=0;
+	
+	if(are_float_args(arguments)){
+		while (!is_the_empty_list(arguments)) {
+			if(IS_FLOAT(car(arguments))){
+				fresult += (car(arguments))->data.dotted.value;
+			}
+			else{
+				fresult += (float)(car(arguments))->data.fixnum.value;
+			}
+			arguments = cdr(arguments);
+		}
+		return new_atom_f(fresult);
+	}
+	else{
+		while (!is_the_empty_list(arguments)) {
+			result += (car(arguments))->data.fixnum.value;
+			arguments = cdr(arguments);
+		}
+		return new_atom_i(result);
+	}
+}
+object_t *sub_proc(object_t *arguments) {
+	long result;
+	float fresult=0;
+	
+	if(are_float_args(arguments)){
+		if(IS_FLOAT(car(arguments))){
+			fresult = (car(arguments))->data.dotted.value;
+		}
+		else{
+			fresult = (float)(car(arguments))->data.fixnum.value;
+		}
+		while (!is_the_empty_list(arguments = cdr(arguments))) {
+			if(IS_FLOAT(car(arguments))){
+				fresult -= (car(arguments))->data.dotted.value;
+			}
+			else{
+				fresult -= (float)(car(arguments))->data.fixnum.value;
+			}
+			//arguments = cdr(arguments);
+		}
+		return new_atom_f(fresult);
+	}
+	else{
+		result = (car(arguments))->data.fixnum.value;
+		while (!is_the_empty_list(arguments = cdr(arguments))) {
+			result -= (car(arguments))->data.fixnum.value;
+			//arguments = cdr(arguments);
+		}
+		return new_atom_i(result);
+	}
+}
+object_t *neg_proc(object_t *arguments){
+	long result;
+	float fresult=0;
+	if(are_float_args(arguments)){
+		fresult = -1 * (car(arguments))->data.dotted.value ;
+		return new_atom_f(fresult);
+	}else{
+		result = -1 * (car(arguments))->data.fixnum.value;
+	}
+	return new_atom_i(result);
+}
+object_t *div_proc(object_t *arguments) {
+	if(are_float_args(arguments)){
+		return new_atom_f(
+			(float)((car(arguments) )->data.dotted.value)/(float)
+			((cadr(arguments))->data.dotted.value));
+	}
+	else{
+		return new_atom_f(
+			(float)((car(arguments) )->data.fixnum.value)/(float)
+			((cadr(arguments))->data.fixnum.value));
+	}
+}
+object_t *mod_proc(object_t *arguments) {
+	if(are_float_args(arguments)){
+//		return new_atom_f((float)
+//			((car(arguments) )->data.dotted.value)%
+//			(float)((cadr(arguments))->data.dotted.value));
+		fprintf(stderr,"float arguments not allowed.\n");
+		return bottom;
+	}
+	else{
+		return new_atom_i(
+			((car(arguments) )->data.fixnum.value)%
+			((cadr(arguments))->data.fixnum.value));
+	}
+}
+object_t *mul_proc(object_t *arguments) {
+	long result = 1;
+	float fresult=1;
+	
+	if(are_float_args(arguments)){
+		while (!is_the_empty_list(arguments)) {
+			if(IS_FLOAT(car(arguments))){
+				fresult *= (car(arguments))->data.dotted.value;
+			}
+			else{
+				fresult *= (float)(car(arguments))->data.fixnum.value;
+			}
+			arguments = cdr(arguments);
+		}
+		return new_atom_f(fresult);
+	}
+	else{
+		while (!is_the_empty_list(arguments)) {
+			result *= (car(arguments))->data.fixnum.value;
+			arguments = cdr(arguments);
+		}
+		return new_atom_i(result);
+	}
+}
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments)){
 	return new_fn(fn);
 }
@@ -203,7 +319,12 @@ void populate_environment(object_t *env) {
 	env);
  
 	add_procedure("error", error_proc);
-
+	add_procedure("add", add_proc);
+	add_procedure("sub", sub_proc);
+	add_procedure("neg", neg_proc);
+	add_procedure("div", div_proc);
+	add_procedure("mod", mod_proc);
+	add_procedure("mul", mul_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \
 		(cons(new_atom_s((name)), cons(new_fn((func_ptr)), NULL)))
