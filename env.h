@@ -15,7 +15,8 @@ object_t *the_empty_environment;
 object_t *the_global_environment;
 
 object_t *error_proc(object_t *args);
-
+void set_debug_var(int b);
+int is_debug_var(void);
 
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments));
 int is_primitive_proc(object_t *obj);

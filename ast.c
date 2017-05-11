@@ -124,6 +124,7 @@ _object* new_atom_bottom(void){
 
 void del_atom(_object *obj){
 	if(obj==NULL) return;
+	if(obj==true || obj==false || obj==the_empty_list) return;
 	//if(is_the_empty_list(obj)) return;
 	//if(IS_BOTTOM(obj)) return;
 	if(IS_STRING(obj)){

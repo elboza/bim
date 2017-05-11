@@ -24,6 +24,23 @@ object_t *error_proc(object_t *args){
 	return new_atom_bottom();
 	//return bottom;
 }
+void set_debug_var(int b){
+	object_t *dbg,*bval;
+	(b==1)?(bval=true):(bval=false);
+	dbg=cons(new_atom_s("__assign__"),cons(new_atom_s("__debug__"),cons(bval,new_empty_list())));
+	eval(dbg,the_global_environment);
+	//del_cascade(dbg);
+}
+int is_debug_var(void){
+	object_t *dbg,*ret;
+	//int x;
+	dbg=new_atom_s("__debug__");
+	ret=eval(dbg,the_global_environment);
+	return is_true(ret);
+	//del_cascade(ret);
+	//del_cascade(dbg);
+	//return x;
+}
 int is_list(object_t *obj){
 	if(is_pair(obj)){
 		if(is_tagged_list(obj,list_symbol)){
@@ -344,13 +361,13 @@ void populate_environment(object_t *env) {
 	make_primitive_proc(c_name),        \
 	env);
  
-	add_procedure("error", error_proc);
-	add_procedure("add", add_proc);
-	add_procedure("sub", sub_proc);
-	add_procedure("neg", neg_proc);
-	add_procedure("div", div_proc);
-	add_procedure("mod", mod_proc);
-	add_procedure("mul", mul_proc);
+	add_procedure("__error__", error_proc);
+	add_procedure("__add__", add_proc);
+	add_procedure("__sub__", sub_proc);
+	add_procedure("__neg__", neg_proc);
+	add_procedure("__div__", div_proc);
+	add_procedure("__mod__", mod_proc);
+	add_procedure("__mul__", mul_proc);
 	//add_procedure("global", global_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \
@@ -376,13 +393,13 @@ void init_env(void){
 	symbol_table = the_empty_list;
 
 	//make_symbol...
-	assign_symbol = make_symbol("assign");
-	lambda_symbol = make_symbol("lambda");
-	begin_symbol = make_symbol("progn");
-	global_symbol = make_symbol("global");
-	list_symbol = make_symbol("list");
-	hash_symbol = make_symbol("hash");
-	ok_symbol = make_symbol("ok");
+	assign_symbol = make_symbol("__assign__");
+	lambda_symbol = make_symbol("__lambda__");
+	begin_symbol = make_symbol("__progn__");
+	global_symbol = make_symbol("__global__");
+	list_symbol = make_symbol("__list__");
+	hash_symbol = make_symbol("__hash__");
+	ok_symbol = make_symbol("__ok__");
 
 	the_empty_environment = the_empty_list;
 	the_global_environment = make_environment();

@@ -84,12 +84,15 @@ void execute(char *s)
 	if(x==0 && ast!=NULL){
 		print_obj(run(ast,the_global_environment));
 		log_d("ast ");
-		printf("\n----------------\n");
-		print_ast(ast);
-		printf("\n----------------\n");
-		print_debug_ast(ast);
-		printf("\n----------------\n");
-		//print_atom(ast);
+		if(is_debug_var()){
+			printf("\n----------------\n");
+			print_ast(ast);
+			printf("\n----------------\n");
+			print_debug_ast(ast);
+			printf("\n----------------\n");
+			//print_atom(ast);
+			printf("debug: %d\n",is_debug_var());
+		}
 		crlf();
 		del_cascade(ast);
 	}

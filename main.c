@@ -90,6 +90,7 @@ int main(int argc,char **argv)
 	struct m_action action;
 	//char filename[FILENAME_LEN];
 	init_env();
+	set_debug_var(DEBUG);
 	parse_args(argc,argv,&action);
 	
 	
