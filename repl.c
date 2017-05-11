@@ -91,7 +91,7 @@ void execute(char *s)
 			print_debug_ast(ast);
 			printf("\n----------------\n");
 			//print_atom(ast);
-			printf("debug: %d\n",is_debug_var());
+			//printf("debug: %d\n",is_debug_var());
 		}
 		crlf();
 		del_cascade(ast);

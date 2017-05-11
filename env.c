@@ -36,7 +36,9 @@ int is_debug_var(void){
 	//int x;
 	dbg=new_atom_s("__debug__");
 	ret=eval(dbg,the_global_environment);
-	return is_true(ret);
+	//if(IS_BOOLEAN(ret) && ret->data.boolean.value==1) return 1;
+	//return 0;
+	return is_true2(ret);
 	//del_cascade(ret);
 	//del_cascade(dbg);
 	//return x;

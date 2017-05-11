@@ -155,3 +155,10 @@ int is_false(object_t *obj) {
 int is_true(object_t *obj) {
 	return !is_false(obj);
 }
+int is_false2(object_t *obj){
+	return !is_true2(obj);
+}
+int is_true2(object_t *obj){
+	if(IS_BOOLEAN(obj) && obj->data.boolean.value==1) return 1;
+	return 0;
+}

@@ -87,6 +87,8 @@ _object *new_empty_list(void);
 int is_the_empty_list(_object *obj);
 int is_false(object_t *obj);
 int is_true(object_t *obj);
+int is_false2(object_t *obj);
+int is_true2(object_t *obj);
 
 
 #define caar(obj)   car(car(obj))

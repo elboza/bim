@@ -60,6 +60,7 @@ newline \n
 "<<<"		return rot_l;
 ">>>"		return rot_r;
 "%%"		return REMINDER;
+"->"		return APPLY;
 
 
 [-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£^] {
