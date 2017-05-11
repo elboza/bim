@@ -5,6 +5,8 @@ char is_self_evaluating(object_t *exp);
 char is_variable(object_t *expression);
 char is_tagged_list(object_t *expression, object_t *tag);
 
+object_t *eval_list(object_t *exp,object_t *env);
+object_t *eval_hash(object_t *exp,object_t *env);
 char is_assignment(object_t *exp);
 object_t *assignment_variable(object_t *exp);
 object_t *assignment_value(object_t *exp);

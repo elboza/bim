@@ -106,10 +106,14 @@ void print_obj(_object *obj){
 	}
 }
 void print_list(_object *obj){
+	object_t *x;
+	x=obj;
 	printf("#<list>");
+	print_ast(x);
 }
 void print_hash(_object *obj){
 	printf("#<hash>");
+	print_ast(obj);
 }
 void print_func(_object *obj){
 	if(is_primitive_proc(obj)){

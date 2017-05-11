@@ -31,6 +31,27 @@ char is_tagged_list(object_t *expression, object_t *tag) {
 	return 0;
 }
 
+object_t *eval_list(object_t *exp,object_t *env){
+    //return cons(car(exp),apply_operands(cdr(exp)));
+    object_t *car_obj,*cdr_obj,*ret;
+    car_obj=cadr(exp);
+    cdr_obj=cddr(exp);
+    while(car_obj){
+        ret=eval(car_obj,env);print_atom(ret);
+        if(ret!=car_obj){
+            printf("!");
+            //substitute node
+        }
+        car_obj=car(cdr_obj);
+        cdr_obj=cdr(cdr_obj);
+    }
+    return exp;
+}
+object_t *eval_hash(object_t *exp,object_t *env){
+    
+    return exp;
+}
+
 char is_assignment(object_t *exp) {
 	return is_tagged_list(exp, set_symbol);
 }
@@ -367,6 +388,12 @@ tailcall:
     }
     else if (is_definition(exp)) {
         return eval_definition(exp, env);
+    }
+    else if(is_list(exp)){
+        return eval_list(exp,env);
+    }
+    else if(is_hash(exp)){
+        return eval_hash(exp,env);
     }
     else if (is_if(exp)) {
         exp = is_true(eval(if_predicate(exp), env)) ?
