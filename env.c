@@ -206,6 +206,21 @@ object_t *mul_proc(object_t *arguments) {
 		return new_atom_i(result);
 	}
 }
+object_t *count_proc(object_t *arguments){
+	object_t *x=car(arguments);
+	//if istagged list "__list__" || "__hash__"
+	if(!is_list(x) && !is_hash(x)){
+		fprintf(stderr,"the argument is not a list or a hash\n");
+		return new_atom_bottom();
+	}
+	x=cdr(x);
+	int n=0;
+	while(!is_the_empty_list(x)){
+		x=cdr(x);
+		n++;
+	}
+	return new_atom_i(n);
+}
 object_t *get_list_proc(object_t *arguments){
 	object_t *index,*list;
 	index=car(arguments);
@@ -385,6 +400,7 @@ void populate_environment(object_t *env) {
 	add_procedure("__mod__", mod_proc);
 	add_procedure("__mul__", mul_proc);
 	add_procedure("__get_list__", get_list_proc);
+	add_procedure("count", count_proc);
 	//add_procedure("global", global_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \

@@ -148,8 +148,8 @@ func_application: symbol '(' func_args ')' {/*$$=cons(new_atom_s("__apply__"),co
 	| lambda APPLY '(' func_args ')' {$$=cons($1,$4);}
 	| symbol APPLY '(' func_args ')' {$$=cons($1,$4);}
 
-func_args: expr {$$=cons($1,new_empty_list());}
-	|expr ',' func_args {$$=cons($1,$3);}
+func_args: object {$$=cons($1,new_empty_list());}
+	|object ',' func_args {$$=cons($1,$3);}
 	|{$$=new_empty_list();}
 
 list: '[' listitems ']' {$$=cons(new_atom_s("__list__"),$2);}
