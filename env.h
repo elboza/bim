@@ -37,6 +37,7 @@ object_t *neg_proc(object_t *arguments);
 object_t *div_proc(object_t *arguments);
 object_t *mod_proc(object_t *arguments);
 object_t *mul_proc(object_t *arguments);
+object_t *get_list_proc(object_t *arguments);
 object_t *enclosing_environment(object_t *env);
 object_t *first_frame(object_t *env);
 object_t *make_frame(object_t *variables, object_t *values);

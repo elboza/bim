@@ -206,6 +206,20 @@ object_t *mul_proc(object_t *arguments) {
 		return new_atom_i(result);
 	}
 }
+object_t *get_list_proc(object_t *arguments){
+	object_t *index,*list;
+	index=car(arguments);
+	list=cadr(arguments);
+	list=cdr(list);
+	int n=0;
+	int index_val=index->data.fixnum.value;
+	if(list==NULL) return new_atom_bottom();
+	if(is_the_empty_list(list)) return new_atom_bottom();
+	while(n++<index_val){
+		list=cdr(list);
+	}
+	return car(list);
+}
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments)){
 	return new_fn(fn);
 }
@@ -370,6 +384,7 @@ void populate_environment(object_t *env) {
 	add_procedure("__div__", div_proc);
 	add_procedure("__mod__", mod_proc);
 	add_procedure("__mul__", mul_proc);
+	add_procedure("__get_list__", get_list_proc);
 	//add_procedure("global", global_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \

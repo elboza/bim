@@ -33,6 +33,7 @@ void yyerror(struct _object **ast,char *s);
 %type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE
 //<int_val> expr
 //%left EQ
+%right APPLY
 %precedence THEN
 %precedence ELSE
 %left AND OR
