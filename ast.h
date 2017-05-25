@@ -6,11 +6,11 @@
 #ifndef AST_H
 #define AST_H
 
-enum __type{T_ATOM,T_LIST,T_CONS,T_EMPTY_LIST,T_BOTTOM,t_lambda,t_func,t_compound_proc,t_integer,t_float,t_symbol,t_string_qq,t_string_q,t_boolean};
+typedef enum __type{T_ATOM,T_LIST,T_CONS,T_PAIR,T_EMPTY_LIST,T_BOTTOM,t_lambda,t_func,t_compound_proc,t_integer,t_float,t_symbol,t_string_qq,t_string_q,t_boolean} __object_type;
 
 typedef struct _object{
-	int ltype;
-	int type;
+	__object_type ltype;
+	__object_type type;
 
 	union{
 		struct {

@@ -223,6 +223,7 @@ object_t *count_proc(object_t *arguments){
 }
 object_t *get_list_proc(object_t *arguments){
 	object_t *index,*list;
+	if(!is_list(cadr(arguments))) return new_atom_bottom();
 	index=car(arguments);
 	list=cadr(arguments);
 	list=cdr(list);
@@ -234,6 +235,18 @@ object_t *get_list_proc(object_t *arguments){
 		list=cdr(list);
 	}
 	return car(list);
+}
+object_t *get_hash_proc(object_t *arguments){
+	object_t *key,*list,*obj;
+	key=car(arguments);
+	list=cdadr(arguments);
+	if(!is_hash(cadr(arguments))) return new_atom_bottom();
+	while(list && !is_the_empty_list(list)){
+		obj=caar(list);
+		if(strcmp(obj->data.string.value,key->data.string.value)==0) return cadar(list);
+		list=cdr(list);
+	}
+	return new_atom_bottom();
 }
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments)){
 	return new_fn(fn);
@@ -400,6 +413,7 @@ void populate_environment(object_t *env) {
 	add_procedure("__mod__", mod_proc);
 	add_procedure("__mul__", mul_proc);
 	add_procedure("__get_list__", get_list_proc);
+	add_procedure("__get_hash__", get_hash_proc);
 	add_procedure("count", count_proc);
 	//add_procedure("global", global_proc);
 

@@ -13,6 +13,8 @@ _object* new_object(void){
 	obj=(_object*)malloc(sizeof(_object));
 	if(!obj) return NULL;
 	//obj->sval=NULL;
+	obj->ltype=T_EMPTY_LIST;
+	obj->type=T_EMPTY_LIST;
 	obj->data.pair.car=NULL;
 	obj->data.pair.cdr=NULL;
 	return obj;
@@ -76,6 +78,7 @@ _object* cons(_object *first,_object *last){
 	obj=new_object();
 	if(!obj) return NULL;
 	obj->ltype=T_CONS;
+	obj->type=T_PAIR;
 	obj->data.pair.car=first;
 	obj->data.pair.cdr=last;
 	return obj;
