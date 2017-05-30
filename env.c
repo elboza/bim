@@ -248,6 +248,57 @@ object_t *get_hash_proc(object_t *arguments){
 	}
 	return new_atom_bottom();
 }
+int subst_node_tree(object_t *exnode,object_t *newnode){
+	exnode->ancestor->data.pair.car=newnode;
+	newnode->ancestor=exnode->ancestor;
+	return 0;
+}
+int append_node_tree(object_t *exnode,object_t *newnode){
+	exnode->ancestor->data.pair.cdr=newnode;
+	newnode->ancestor=exnode->ancestor;
+	return 0;
+}
+int add_node_last(object_t *lastnode,object_t *newnode){
+	object_t *list;
+	list=cdr(lastnode);
+	//if(!is_hash(cadr(arguments))) return new_atom_bottom();
+	while(list && !is_the_empty_list(list)){
+		list=cdr(list);
+	}
+	return append_node_tree(list,cons(newnode,new_empty_list()));
+}
+object_t *make_hash_node(object_t *key,object_t *val){
+	return cons(key,cons(val,new_empty_list()));
+}
+object_t *set_list_proc(object_t *arguments){
+	object_t *index,*var,*val,*obj;
+	//printf("set list\n");
+	index=car(arguments);
+	var=cadr(arguments);
+	val=caddr(arguments);
+	if(!is_list(var)){
+		//printf("not a list!!\n");
+		return bottom;
+	}
+	obj=get_list_proc(arguments);
+	if(subst_node_tree(obj,val)!=0) return bottom;
+	return ok_symbol;
+}
+object_t *set_hash_proc(object_t *arguments){
+	object_t *index,*var,*val,*obj;
+	//printf("set hash\n");
+	index=car(arguments);
+	var=cadr(arguments);
+	val=caddr(arguments);
+	if(!is_hash(var)){
+		//printf("not a hash!!\n");
+		return bottom;
+	}
+	obj=get_hash_proc(arguments);
+	if(IS_BOTTOM(obj)){add_node_last(var,make_hash_node(index,val));return ok_symbol;}
+	if(subst_node_tree(obj,val)!=0) return bottom;
+	return ok_symbol;
+}
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments)){
 	return new_fn(fn);
 }
@@ -414,6 +465,8 @@ void populate_environment(object_t *env) {
 	add_procedure("__mul__", mul_proc);
 	add_procedure("__get_list__", get_list_proc);
 	add_procedure("__get_hash__", get_hash_proc);
+	add_procedure("__set_list__", set_list_proc);
+	add_procedure("__set_hash__", set_hash_proc);
 	add_procedure("count", count_proc);
 	//add_procedure("global", global_proc);
 

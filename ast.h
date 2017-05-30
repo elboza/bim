@@ -51,6 +51,7 @@ typedef struct _object{
 			//FILE *stream;
 		}output_port;
 	}data;
+	struct _object *ancestor;
 } _object,object_t;
 
 #define IS_ATOM(x)    ((x)->ltype==T_ATOM)
