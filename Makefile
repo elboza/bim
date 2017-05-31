@@ -1,6 +1,10 @@
 CC=gcc
+LIBFLEX=-lfl
+ifeq ($(FLEX),osx)
+LIBFLEX=-ll
+endif
 CFLAGS=-ggdb -Wall -std=gnu99
-LIBS=-lreadline -lm -lfl
+LIBS=-lreadline -lm $(LIBFLEX)
 SRC=src
 OBJECTS= main.o repl.o ast.o env.o eval.o print.o 
 GRAM= lex.yy.c parser.tab.c parser.tab.h
