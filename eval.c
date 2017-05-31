@@ -37,10 +37,11 @@ object_t *eval_list(object_t *exp,object_t *env){
     car_obj=cadr(exp);
     cdr_obj=cddr(exp);
     while(car_obj){
-        ret=eval(car_obj,env);print_atom(ret);
+        ret=eval(car_obj,env);//print_atom(ret);
         if(ret!=car_obj){
-            printf("!");
+            //printf("!");
             //substitute node
+            subst_node_tree(car_obj,ret);
         }
         car_obj=car(cdr_obj);
         cdr_obj=cdr(cdr_obj);
@@ -48,8 +49,30 @@ object_t *eval_list(object_t *exp,object_t *env){
     return exp;
 }
 object_t *eval_hash(object_t *exp,object_t *env){
-    
+    object_t *car_obj,*cdr_obj,*ret;
+    car_obj=cadr(exp);
+    cdr_obj=cddr(exp);
+    while(car_obj){
+        ret=eval(car(car_obj),env);//eval key !
+        if(ret!=car(car_obj)){
+            //printf("!");
+            //substitute node
+            subst_node_tree(car(car_obj),ret);
+        }
+        ret=eval(cadr(car_obj),env);//eval value !
+        if(ret!=cadr(car_obj)){
+            //printf("!");
+            //substitute node
+            subst_node_tree(cadr(car_obj),ret);
+        }
+        car_obj=car(cdr_obj);
+        cdr_obj=cdr(cdr_obj);
+    }
     return exp;
+}
+object_t *eval_range_index(object_t *exp,object_t *env){
+    return eval_list(exp,env);
+    //return exp;
 }
 
 char is_assignment(object_t *exp) {
@@ -394,6 +417,9 @@ tailcall:
     }
     else if(is_hash(exp)){
         return eval_hash(exp,env);
+    }
+    else if(is_range_index(exp)){
+        return eval_range_index(exp,env);
     }
     else if (is_if(exp)) {
         exp = is_true(eval(if_predicate(exp), env)) ?

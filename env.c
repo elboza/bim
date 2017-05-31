@@ -206,12 +206,57 @@ object_t *mul_proc(object_t *arguments) {
 		return new_atom_i(result);
 	}
 }
-object_t *count_proc(object_t *arguments){
-	object_t *x=car(arguments);
+int get_list_index(int index,object_t *list){
+	if(!is_list(list)) return -1;
+	int count=count_list(list);
+	if(index<0) index=count+index; //formally count-index
+	if(index<0 || index>count-1){
+		fprintf(stderr,"list: out of bounds\n");
+		return -1;
+	}
+	return index;
+}
+int is_range_index(object_t *obj){
+	if(is_pair(obj)){
+		if(is_tagged_list(obj,list_range_symbol)){
+			return 1;
+		}
+	}
+	return 0;
+}
+object_t *get_list_range(object_t *index,object_t *list){
+	//printf("list_range\n");
+	int a=cadr(index)->data.fixnum.value;
+	int b=caddr(index)->data.fixnum.value;
+	a=get_list_index(a,list);
+	b=get_list_index(b,list);
+	if(a<b) return get_list_slice(a,b,list);
+	return get_list_slice(b,a,list);
+}
+object_t *get_list_slice(int a,int b,object_t *list){
+	object_t *new_list=cons(new_atom_s("__list__"),new_empty_list());
+	int count=0;
+	list=cdr(list);
+	while(list && !IS_EMPTY(list) && count<=b){
+		if(count>=a){
+			add_node_last(new_list,car(list));
+			//list=cdr(list);
+			//count++;
+		}
+		list=cdr(list);
+		count++;
+	}
+	return new_list;
+}
+object_t *list_range_proc(object_t *arguments){
+
+}
+int count_list(object_t *x){
+	//object_t *x=car(arguments);
 	//if istagged list "__list__" || "__hash__"
 	if(!is_list(x) && !is_hash(x)){
 		fprintf(stderr,"the argument is not a list or a hash\n");
-		return new_atom_bottom();
+		return -1;
 	}
 	x=cdr(x);
 	int n=0;
@@ -219,6 +264,12 @@ object_t *count_proc(object_t *arguments){
 		x=cdr(x);
 		n++;
 	}
+	return n;
+}
+object_t *count_proc(object_t *arguments){
+	object_t *x=car(arguments);
+	int n=count_list(x);
+	if(n==-1) return new_atom_bottom();
 	return new_atom_i(n);
 }
 object_t *get_list_proc(object_t *arguments){
@@ -228,7 +279,9 @@ object_t *get_list_proc(object_t *arguments){
 	list=cadr(arguments);
 	list=cdr(list);
 	int n=0;
-	int index_val=index->data.fixnum.value;
+	if(is_range_index(index)) return get_list_range(index,cadr(arguments));
+	int index_val=get_list_index(index->data.fixnum.value,cadr(arguments));
+	if(index_val==-1) return new_atom_bottom();
 	if(list==NULL) return new_atom_bottom();
 	if(is_the_empty_list(list)) return new_atom_bottom();
 	while(n++<index_val){
@@ -467,6 +520,7 @@ void populate_environment(object_t *env) {
 	add_procedure("__get_hash__", get_hash_proc);
 	add_procedure("__set_list__", set_list_proc);
 	add_procedure("__set_hash__", set_hash_proc);
+	//add_procedure("__list_range__", list_range_proc);
 	add_procedure("count", count_proc);
 	//add_procedure("global", global_proc);
 
@@ -499,6 +553,7 @@ void init_env(void){
 	global_symbol = make_symbol("__global__");
 	list_symbol = make_symbol("__list__");
 	hash_symbol = make_symbol("__hash__");
+	list_range_symbol = make_symbol("__list_range__");
 	ok_symbol = make_symbol("__ok__");
 
 	the_empty_environment = the_empty_list;
