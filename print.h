@@ -9,5 +9,6 @@ void print_obj(_object *obj);
 void print_list(_object *obj);
 void print_hash(_object *obj);
 void print_func(_object *obj);
+object_t *type_proc(object_t *obj);
 
 #endif

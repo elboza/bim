@@ -520,8 +520,9 @@ void populate_environment(object_t *env) {
 	add_procedure("__get_hash__", get_hash_proc);
 	add_procedure("__set_list__", set_list_proc);
 	add_procedure("__set_hash__", set_hash_proc);
-	//add_procedure("__list_range__", list_range_proc);
+	add_procedure("__type__", type_proc);
 	add_procedure("count", count_proc);
+	add_procedure("type", type_proc);
 	//add_procedure("global", global_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \

@@ -126,3 +126,53 @@ void print_func(_object *obj){
 		printf("#<function>");
 	}
 }
+object_t *type_proc(object_t *obj){
+	//printf("type...\n");
+	obj=car(obj);
+	if(!obj) {fprintf(stderr,"error object type...\n");return bottom;}
+	if(IS_ATOM(obj)){
+		switch(obj->type){
+		case t_integer:
+			return new_atom_s("integer");
+			break;
+		case t_float:
+			return new_atom_s("float");
+			break;
+		case t_symbol:
+			return new_atom_s("symbol");
+			break;
+		case t_string_qq:
+			return new_atom_s("string");
+			break;
+		case t_string_q:
+			return new_atom_s("string");
+			break;
+		case t_boolean:
+			return new_atom_s("boolean");
+			break;
+		default:
+			return bottom;
+			break;
+	}
+	}
+	else if(is_pair(obj)){
+		if(is_list(obj)){
+			return new_atom_s("list");
+		}
+		else if(is_hash(obj)){
+			return new_atom_s("hash");
+		}
+		else if(is_func(obj)){
+			return new_atom_s("function");
+		}
+		else{
+			printf("u?\n");
+			return bottom;
+		}
+	}
+	else{
+		printf("u?\n");
+		return bottom;
+	}
+	return bottom;
+}
