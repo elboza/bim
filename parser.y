@@ -73,7 +73,7 @@ fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
 		|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}
 		|LET symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}
 		|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
-		|PRN printlist					{$$=cons(new_atom_s("__prn__"),cons($2,new_empty_list()));}
+		|PRN printlist					{$$=cons(new_atom_s("__prn__"),$2);}
 		|TYPE sexpr					{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
 		|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
 		|WHILE '(' bexpr ')' sexpr {$$=cons(new_atom_s("__while__"),cons($3,cons($5,new_empty_list())));}

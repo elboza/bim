@@ -422,7 +422,7 @@ tailcall:
         return eval_range_index(exp,env);
     }
     else if (is_if(exp)) {
-        exp = is_true(eval(if_predicate(exp), env)) ?
+        exp = is_true2(eval(if_predicate(exp), env)) ?
                   if_consequent(exp) :
                   if_alternative(exp);
         goto tailcall;
@@ -467,7 +467,7 @@ tailcall:
         }
         while (!is_last_exp(exp)) {
             result = eval(first_exp(exp), env);
-            if (is_true(result)) {
+            if (is_true2(result)) {
                 return result;
             }
             exp = rest_exps(exp);

@@ -248,9 +248,6 @@ object_t *get_list_slice(int a,int b,object_t *list){
 	}
 	return new_list;
 }
-object_t *list_range_proc(object_t *arguments){
-
-}
 int count_list(object_t *x){
 	//object_t *x=car(arguments);
 	//if istagged list "__list__" || "__hash__"
@@ -324,9 +321,9 @@ object_t *make_hash_node(object_t *key,object_t *val){
 	return cons(key,cons(val,new_empty_list()));
 }
 object_t *set_list_proc(object_t *arguments){
-	object_t *index,*var,*val,*obj;
+	object_t *var,*val,*obj;
 	//printf("set list\n");
-	index=car(arguments);
+	//index=car(arguments);
 	var=cadr(arguments);
 	val=caddr(arguments);
 	if(!is_list(var)){
@@ -523,7 +520,8 @@ void populate_environment(object_t *env) {
 	add_procedure("__type__", type_proc);
 	add_procedure("count", count_proc);
 	add_procedure("type", type_proc);
-	//add_procedure("global", global_proc);
+	add_procedure("__prn__", prn_proc);
+	add_procedure("print", prn_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \
 		(cons(new_atom_s((name)), cons(new_fn((func_ptr)), NULL)))
@@ -556,6 +554,7 @@ void init_env(void){
 	hash_symbol = make_symbol("__hash__");
 	list_range_symbol = make_symbol("__list_range__");
 	ok_symbol = make_symbol("__ok__");
+	if_symbol = make_symbol("__if__");
 
 	the_empty_environment = the_empty_list;
 	the_global_environment = make_environment();

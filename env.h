@@ -41,7 +41,6 @@ int get_list_index(int index,object_t *list);
 int is_range_index(object_t *obj);
 object_t *get_list_range(object_t *index,object_t *list);
 object_t *get_list_slice(int a,int b,object_t *list);
-object_t *list_range_proc(object_t *arguments);
 int count_list(object_t *list);
 object_t *count_proc(object_t *arguments);
 object_t *get_list_proc(object_t *arguments);
