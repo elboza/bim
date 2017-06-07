@@ -452,7 +452,7 @@ tailcall:
         }
         while (!is_last_exp(exp)) {
             result = eval(first_exp(exp), env);
-            if (is_false(result)) {
+            if (is_false2(result)) {
                 return result;
             }
             exp = rest_exps(exp);

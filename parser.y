@@ -109,6 +109,7 @@ expr:	number		{$$=$1;}
 
 bexpr: boolean {$$=$1;}
 	/*|expr {$$=$1;}*/
+	|'(' bexpr ')' {$$=$2;}
 	|bexpr AND bexpr {$$=cons(new_atom_s("__and__"),cons($1,cons($3,new_empty_list())));}
 	|bexpr OR bexpr {$$=cons(new_atom_s("__or__"),cons($1,cons($3,new_empty_list())));}
 	|expr '<' expr {$$=cons(new_atom_s("__lt__"),cons($1,cons($3,new_empty_list())));}

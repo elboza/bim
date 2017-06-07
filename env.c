@@ -206,6 +206,128 @@ object_t *mul_proc(object_t *arguments) {
 		return new_atom_i(result);
 	}
 }
+object_t *is_number_equal_proc(object_t *arguments) {
+	long value;
+	float f1,f2;
+	if(are_float_args(arguments)){
+		if(IS_FLOAT(car(arguments))) {f1=((car(arguments))->data.dotted.value);} else {f1=(float)((car(arguments))->data.fixnum.value);}
+		while (!IS_EMPTY(arguments = cdr(arguments))) {
+			if(IS_FLOAT(car(arguments))){
+				f2=((car(arguments))->data.dotted.value);
+			}
+			else{
+				f2=(float)((car(arguments))->data.fixnum.value);
+			}
+			if (f1 != f2) {
+				return false;
+			}
+		}
+		return true;
+	}
+	else{
+		value = (car(arguments))->data.fixnum.value;
+		while (!IS_EMPTY(arguments = cdr(arguments))) {
+			if (value != ((car(arguments))->data.fixnum.value)) {
+				return false;
+			}
+		}
+		return true;
+	}
+}
+object_t *is_not_number_equal_proc(object_t *arguments){
+	return not_proc(cons(is_number_equal_proc(arguments),the_empty_list));
+}
+object_t *not_proc(object_t *arguments){
+	object_t *x;
+	x=car(arguments);
+	if(IS_BOOLEAN(x)){
+		if(is_true2(x)) return false;
+		return true;
+	}
+	fprintf(stderr,"argument is not boolean\n");
+	return bottom;
+}
+object_t *is_less_than_proc(object_t *arguments) {
+	long previous;
+	long next;
+	float f1,f2;
+	
+	if(are_float_args(arguments)){
+		if(IS_FLOAT(car(arguments))) {f1=((car(arguments))->data.dotted.value);} else {f1=(float)((car(arguments))->data.fixnum.value);}
+		while (!IS_EMPTY(arguments = cdr(arguments))) {
+			if(IS_FLOAT(car(arguments))){
+				f2=((car(arguments))->data.dotted.value);
+			}
+			else{
+				f2=(float)((car(arguments))->data.fixnum.value);
+			}
+			if (f1 < f2) {
+				f1=f2;
+			}
+			else{
+				return false;
+			}
+		}
+		return true;
+	}
+	else{
+		previous = (car(arguments))->data.fixnum.value;
+		while (!IS_EMPTY(arguments = cdr(arguments))) {
+			next = (car(arguments))->data.fixnum.value;
+			if (previous < next) {
+				previous = next;
+			}
+			else {
+				return false;
+			}
+		}
+		return true;
+	}
+}
+
+object_t *is_greater_than_proc(object_t *arguments) {
+	long previous;
+	long next;
+	float f1,f2;
+	
+	if(are_float_args(arguments)){
+		if(IS_FLOAT(car(arguments))) {f1=((car(arguments))->data.dotted.value);} else {f1=(float)((car(arguments))->data.fixnum.value);}
+		while (!IS_EMPTY(arguments = cdr(arguments))) {
+			if(IS_FLOAT(car(arguments))){
+				f2=((car(arguments))->data.dotted.value);
+			}
+			else{
+				f2=(float)((car(arguments))->data.fixnum.value);
+			}
+			if (f1 > f2) {
+				f1=f2;
+			}
+			else{
+				return false;
+			}
+		}
+		return true;
+	}
+	else{
+		previous = (car(arguments))->data.fixnum.value;
+		while (!IS_EMPTY(arguments = cdr(arguments))) {
+			next = (car(arguments))->data.fixnum.value;
+			if (previous > next) {
+				previous = next;
+			}
+			else {
+				return false;
+			}
+		}
+		return true;
+	}
+}
+object_t *is_less_and_eq_than_proc(object_t *arguments){
+	return not_proc(cons(is_greater_than_proc(arguments),the_empty_list));
+}
+object_t *is_greater_and_eq_than_proc(object_t *arguments){
+	return not_proc(cons(is_less_than_proc(arguments),the_empty_list));
+}
 int get_list_index(int index,object_t *list){
 	if(!is_list(list)) return -1;
 	int count=count_list(list);
@@ -453,11 +575,11 @@ void set_variable_value(object_t *var, object_t *val, object_t *env) {
 	object_t *vars;
 	object_t *vals;
  
-	while (!is_the_empty_list(env)) {
+	while (!IS_EMPTY(env)) {
 		frame = first_frame(env);
 		vars = frame_variables(frame);
 		vals = frame_values(frame);
-		while (!is_the_empty_list(vars)) {
+		while (!IS_EMPTY(vars)) {
 			if (is_equal_variable(var, car(vars))) {
 				set_car(vals, val);
 				return;
@@ -522,6 +644,13 @@ void populate_environment(object_t *env) {
 	add_procedure("type", type_proc);
 	add_procedure("__prn__", prn_proc);
 	add_procedure("print", prn_proc);
+	add_procedure("__eq__",is_number_equal_proc);
+	add_procedure("__neq__",is_not_number_equal_proc);
+	add_procedure("__not__",not_proc);
+	add_procedure("__lt__",is_less_than_proc);
+	add_procedure("__gt__",is_greater_than_proc);
+	add_procedure("__le__",is_less_and_eq_than_proc);
+	add_procedure("__ge__",is_greater_and_eq_than_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \
 		(cons(new_atom_s((name)), cons(new_fn((func_ptr)), NULL)))
@@ -555,6 +684,8 @@ void init_env(void){
 	list_range_symbol = make_symbol("__list_range__");
 	ok_symbol = make_symbol("__ok__");
 	if_symbol = make_symbol("__if__");
+	or_symbol = make_symbol("__or__");
+	and_symbol = make_symbol("__and__");
 
 	the_empty_environment = the_empty_list;
 	the_global_environment = make_environment();
