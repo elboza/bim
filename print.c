@@ -159,6 +159,9 @@ void print_obj(_object *obj){
 			printf("u?\n");
 		}
 	}
+	else if(IS_EMPTY(obj)){
+		printf("()");
+	}
 	else{
 		printf("u?\n");
 	}

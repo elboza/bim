@@ -11,6 +11,7 @@ char is_self_evaluating(object_t *exp) {
 	IS_FLOAT(exp)     ||
 	IS_BOTTOM(exp)    ||
 	//is_character(exp) ||
+    IS_EMPTY(exp) ||
 	IS_STRING(exp);
 }
 

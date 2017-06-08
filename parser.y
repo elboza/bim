@@ -34,8 +34,8 @@ void yyerror(struct _object **ast,char *s);
 //<int_val> expr
 //%left EQ
 %right APPLY
-%precedence THEN
-%precedence ELSE
+%nonassoc THEN
+%nonassoc ELSE
 %left AND OR
 %left '<' '>' EQ NEQ LE GE
 %precedence NOT
@@ -123,7 +123,7 @@ bexpr: boolean {$$=$1;}
 	|'!' bexpr  %prec NOT {$$=cons(new_atom_s("__not__"),cons($2,new_empty_list()));}
 
 MAYBEELSE: ELSE sexpr %prec ELSE{$$=$2;}
-	|';' ELSE sexpr %prec ELSE{$$=$3;}
+	/*|';' ELSE sexpr %prec ELSE{$$=$3;}*/
 	| %prec THEN{$$=new_empty_list();}
 
 number:	INTEGER							{$$=new_atom_i($1);}
