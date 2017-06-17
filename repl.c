@@ -27,6 +27,10 @@ extern void yylex_destroy(void);
 // 	add_history(input);
 // 	return input;
 // }
+
+void reset_stdin(void){
+	freopen("/dev/tty","rb",stdin);
+}
 char* rl_gets (char *prompt)
 {
 	static char *line_read = (char *)NULL;
@@ -54,6 +58,7 @@ void shell()
 	quit_shell=0;
 	int line_no=1;
 	//if(check_funny()) funny_shell_disclaimer(); else normal_shell_disclaimer();
+	reset_stdin();
 	printf("entering shell-interactive mode...\n");
 	rl_variable_bind("blink-match-paren","on");
 	while(!quit_shell)

@@ -7,6 +7,7 @@
 #define REPL_H
 
 #define MAX_CMD 255
+void reset_stdin(void);
 int quit_shell;
 void shell(void);
 void execute(char *s);
