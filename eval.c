@@ -141,7 +141,15 @@ object_t *if_alternative(object_t *exp) {
         return cadddr(exp);
     }
 }
-
+char is_while(object_t *exp){
+    return is_tagged_list(exp, while_symbol);
+}
+object_t *while_condition(object_t *exp){
+    return cadr(exp);
+}
+object_t *while_body(object_t *exp){
+    return caddr(exp);
+}
 object_t *make_lambda(object_t *parameters, object_t *body) {
     return cons(lambda_symbol, cons(parameters, body));
 }
@@ -394,6 +402,7 @@ object_t *eval(object_t *exp, object_t *env) {
     object_t *procedure;
     object_t *arguments;
     object_t *result;
+    object_t *while_result;
 
 tailcall:
     if (is_self_evaluating(exp)) {
@@ -432,6 +441,13 @@ tailcall:
         return make_compound_proc(lambda_parameters(exp),
                                   lambda_body(exp),
                                   env);
+    }
+    else if(is_while(exp)){
+        if(is_true2(eval(while_condition(exp),env))){
+            while_result=eval(while_body(exp),env);
+            goto tailcall;
+        }
+        return while_result;
     }
     else if (is_begin(exp)) {
         exp = begin_actions(exp);

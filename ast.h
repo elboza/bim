@@ -136,6 +136,7 @@ object_t *or_symbol;
 object_t *list_symbol;
 object_t *hash_symbol;
 object_t *list_range_symbol;
+object_t *while_symbol;
 //object_t *letstar_symbol;
 //object_t *letrec_symbol;
 //object_t *defmacro_symbol;

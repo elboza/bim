@@ -686,6 +686,7 @@ void init_env(void){
 	if_symbol = make_symbol("__if__");
 	or_symbol = make_symbol("__or__");
 	and_symbol = make_symbol("__and__");
+	while_symbol = make_symbol("__while__");
 
 	the_empty_environment = the_empty_list;
 	the_global_environment = make_environment();
