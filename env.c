@@ -338,6 +338,16 @@ int get_list_index(int index,object_t *list){
 	}
 	return index;
 }
+int get_string_index(int index,object_t *x){
+	if(!IS_STRING(x)) return -1;
+	int count=count_str(x);
+	if(index<0) index=count+index; //formally count-index
+	if(index<0 || index>count-1){
+		fprintf(stderr,"string: out of bounds\n");
+		return -1;
+	}
+	return index;
+}
 int is_range_index(object_t *obj){
 	if(is_pair(obj)){
 		if(is_tagged_list(obj,list_range_symbol)){
@@ -355,6 +365,14 @@ object_t *get_list_range(object_t *index,object_t *list){
 	if(a<b) return get_list_slice(a,b,list);
 	return get_list_slice(b,a,list);
 }
+object_t *get_string_range(object_t *index,object_t *x){
+	int a=cadr(index)->data.fixnum.value;
+	int b=caddr(index)->data.fixnum.value;
+	a=get_string_index(a,x);
+	b=get_string_index(b,x);
+	if(a<b) return get_string_slice(a,b,x);
+	return get_string_slice(b,a,x);
+}
 object_t *get_list_slice(int a,int b,object_t *list){
 	object_t *new_list=cons(new_atom_s("__list__"),new_empty_list());
 	int count=0;
@@ -369,6 +387,14 @@ object_t *get_list_slice(int a,int b,object_t *list){
 		count++;
 	}
 	return new_list;
+}
+object_t *get_string_slice(int a,int b,object_t *x){
+	char *s,*p=(char*)(x->data.string.value+a);
+	int len=count_str(x);
+	s=(char*)malloc(len+5);
+	if(!s){fprintf(stderr,"error allocating memory...\n"); return new_atom_bottom();}
+	if(!strncpy(s,p,b-a+1)){fprintf(stderr,"error getting string slice...\n"); return new_atom_bottom();}
+	return new_atom_s(s);
 }
 int count_list(object_t *x){
 	//object_t *x=car(arguments);
@@ -385,14 +411,40 @@ int count_list(object_t *x){
 	}
 	return n;
 }
+int count_str(object_t *x){
+	if(!IS_STRING(x)){ fprintf(stderr,"argment is not a string.\n"); return -1;}
+	if(x->data.string.value){
+		return strlen(x->data.string.value);
+	}
+	fprintf(stderr,"invalid string...\n");
+	return -1;
+}
 object_t *count_proc(object_t *arguments){
 	object_t *x=car(arguments);
-	int n=count_list(x);
+	int n;
+	if(IS_STRING(x)){
+		n=count_str(x);
+		return new_atom_i(n);
+	}
+	n=count_list(x);
 	if(n==-1) return new_atom_bottom();
 	return new_atom_i(n);
 }
+object_t *get_string_at(object_t *arguments){
+	object_t *x=cadr(arguments);
+	object_t *index=car(arguments);
+	char str[10];
+	if(!IS_STRING(x)){ fprintf(stderr,"argument is not a string.\n"); return new_atom_bottom();}
+	if(is_range_index(index)) return get_string_range(index,x);
+	int index_val=get_string_index(index->data.fixnum.value,x);
+	if(index_val==-1) return new_atom_bottom();
+	str[0]=x->data.string.value[index_val];
+	str[1]='\0';
+	return new_atom_s((char*)&str);
+}
 object_t *get_list_proc(object_t *arguments){
 	object_t *index,*list;
+	if(IS_STRING(cadr(arguments))) return get_string_at(arguments);
 	if(!is_list(cadr(arguments))) return new_atom_bottom();
 	index=car(arguments);
 	list=cadr(arguments);
