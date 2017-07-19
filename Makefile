@@ -1,32 +1,68 @@
-CC=gcc
-LIBFLEX=-lfl
-ifeq ($(FLEX),osx)
-LIBFLEX=-ll
-endif
-CFLAGS=-ggdb -Wall -std=gnu99
-LIBS=-lreadline -lm $(LIBFLEX)
-SRC=src
-OBJECTS= main.o repl.o ast.o env.o eval.o print.o 
-GRAM= lex.yy.c parser.tab.c
-RMGRAM= $(GRAM) parser.tab.h parser.output
+VERSION=`cat VERSION|grep VERSION=\"|cut -d '"' -f2`
+BINDIR=/usr/local/bin
+MANDIR=/usr/local/share/man/man1
+SRC=bim
 TARGET=bim
+SRC_DIR=src
+DOC_DIR=doc
+DIST_DIR=bim
+MANSRC=doc/${TARGET}.man
+MANDST=man/${TARGET}.man
+MANTARGET=${TARGET}.1
+SHELL=/bin/bash
 
-all: $(TARGET)
+.PHONY: clean install uninstall dist
 
-.PHONY: clean
-
-$(TARGET): $(GRAM) $(OBJECTS)
-	$(CC) $(OBJECTS) $(GRAM) $(LIBS) -o $(TARGET)
-	
-%.o : %.c
-	$(CC) $(CFLAGS) -c $<
-	
-parser.tab.c parser.tab.h: parser.y ast.h
-	bison -d -v parser.y
-	
-lex.yy.c: lexer.l parser.tab.h
-	flex lexer.l
+all:
+	$(MAKE) -C src
+	$(MAKE) -C doc
 
 clean:
-	rm -f *.o $(RMGRAM)
-	rm -f $(TARGET)
+	if [ -d ${DIST_DIR} ]; then rmdir ${DIST_DIR}; fi
+	$(MAKE) -C src clean
+	$(MAKE) -C doc clean
+install:
+	echo "installing ${TARGET} to ${DESTDIR}${BINDIR}"
+	mkdir -p ${DESTDIR}${BINDIR}
+	cp -p ${SRC_DIR}/${SRC} ${DESTDIR}${BINDIR}/${TARGET}
+	chmod 555 ${DESTDIR}${BINDIR}/${TARGET}
+	mkdir -p ${DESTDIR}${MANDIR}
+	cp -p ${MANSRC} ${DESTDIR}${MANDIR}/${MANTARGET}
+	chmod 644 ${DESTDIR}${MANDIR}/${MANTARGET}
+	
+uninstall:
+	rm -f ${DESTDIR}${BINDIR}/${TARGET}
+	rm -f ${DESTDIR}${MANDIR}/${MANTARGET}
+	
+dist:
+	mkdir -p ${DIST_DIR}/${SRC_DIR}
+	cp ${SRC_DIR}/* ${DIST_DIR}/${SRC_DIR}/
+	cp Makefile ${DIST_DIR}/
+	cp VERSION ${DIST_DIR}/
+	cp README.md ${DIST_DIR}/
+	cp ChangeLog ${DIST_DIR}/
+	cp LICENCE ${DIST_DIR}/
+	mkdir -p ${DIST_DIR}/media
+	cp media/* ${DIST_DIR}/media/
+	mkdir -p ${DIST_DIR}/doc
+	cp -p ${DOC_DIR}/* ${DIST_DIR}/${DOC_DIR}/
+	COPYFILE_DISABLE=1 tar -cvzf ${TARGET}-${VERSION}.tar.gz ${DIST_DIR}/
+	rm -rf ./${DIST_DIR}/*
+	rmdir ${DIST_DIR}
+
+help:
+	@ echo "bim Makefile help:"
+	@ echo " "
+	@ echo "Build options:"
+	@ echo "=============="
+	@ echo "  FLEX=osx  - to build on macosx systems (make FLEX=osx)"
+	@ echo "              uses -ll instead of -lfl flex gcc flag"
+	@ echo " "
+	@ echo "Targets:"
+	@ echo "========"
+	@ echo "The following targets are available"
+	@ echo "  help      - print this message"
+	@ echo "  install   - install everything"
+	@ echo "  uninstall - uninstall everything"
+	@ echo "  clean     - remove any temporary files"
+	@ echo "  dist      - make a dist .tar.gz tarball package"
