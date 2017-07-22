@@ -57,12 +57,14 @@ show bim's version number
  a[0]                # 'f'
  a=0xfe              #254
  a=[1,2,3,4,5,6]     #a is a list
+ count(a)            # 6 (number of elements)
  a[3]                # 4
  a[-1]               # 6
  a[2:5]              # [3,4,5,6]
  a[:3]               # [1,2,3,4]
  a[3:]               # [4,5,6]
  a={'foo':2,'bar':3} # a is a hash
+ count(a)            # 2 (number of elements)
  a['foo']            # 2
  ^a=4				# assign global var a (^ refers to global vars ... see functions section).
 
@@ -150,6 +152,7 @@ show bim's version number
  * IO files/disk
  * JSON encode/decode
  * DB SQL interact
+ * foreach - list and hash loop
 
 .SH SEE ALSO
 bc(1), bim(1)
