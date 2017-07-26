@@ -5,28 +5,33 @@ bim - Bc IMprooved.
 .B bim [ options ] [ file ]
 .SH DESCRIPTION
 .B bim
-bim lang.
+bim takes the idea from bc (linux command line basic calculator) and shift it in to a modern context. bim is designed to evolve into a modern scripting language.
 .SH OPTIONS
-.TP
-.B -s, --stdin
-file from stdin
 .TP
 .B -i, --interactive, --shell
 interactive (shell mode)
 .TP
-.B -c '{commands}', --command '{commands}'
+.B -e '{commands}', --exec '{commands}'
 command mode (executes commands)
 .P
 For example,
-.B bim -c 'print 2+2'
+.B bim -e 'prn 2+2'
 will output:
 4
 .TP
+.B -s , --stdin
+execute from stdin
+.P
+For example,
+.B echo "2+2" |bim -s
+will output:
+4
+TP
+.B -f <file>, --file <file>
+execute file script.
+.TP
 .B -h, --help
 print usage info
-.TP
-.B -x < file >, --execute < file >
-loads and executes file script.
 .TP
 .B -v, --version
 show bim's version number

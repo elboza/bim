@@ -19,6 +19,8 @@
 #include "print.h"
 #include "parser.tab.h"
 
+extern FILE *yyin;
+extern int errno;
 extern int yy_scan_string(char *s);
 extern void yylex_destroy(void);
 
@@ -102,4 +104,34 @@ void execute(char *s)
 		del_cascade(ast);
 	}
 }
-
+void run_exec(char *buff)
+{
+	struct _object *ast=NULL;
+	if(!buff) return;
+	yy_scan_string(buff);
+	int x=yyparse(&ast);
+	yylex_destroy();
+	if(x==0 && ast!=NULL){
+		//print_obj(run(ast,the_global_environment));
+		run(ast,the_global_environment);
+	}
+	del_cascade(ast);
+	
+}
+void run_script(char *file)
+{
+	struct _object *ast=NULL;
+	if(!file) return;
+	FILE *fp;
+	fp=fopen(file,"r");
+	if(fp==NULL) {printf("error opening %s file.\n",file); return;}
+	yyin=fp;
+	int x=yyparse(&ast);
+	yylex_destroy();
+	if(x==0 && ast!=NULL){
+		//print_obj(run(ast,the_global_environment));
+		run(ast,the_global_environment);
+	}
+	del_cascade(ast);
+	fclose(fp);
+}

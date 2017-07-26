@@ -3,6 +3,8 @@ bim
 
 ### Bc IMprooved.
 
+bim takes the idea from bc (linux command line basic calculator) and shift it in to a modern context. bim is designed to evolve into a modern scripting language.
+
 
 ## HOWTO INSTALL
 
