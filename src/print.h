@@ -8,6 +8,7 @@ void crlf(void);
 void print_ast(_object *ast);
 void print_debug_ast(_object *ast);
 void print_obj(_object *obj);
+void clean_print_obj(_object *obj);
 void display_obj(_object *obj);
 void print_list(_object *obj);
 void print_hash(_object *obj);

@@ -12,12 +12,12 @@ bim takes the idea from bc (linux command line basic calculator) and shift it in
 interactive (shell mode)
 .TP
 .B -e '{commands}', --exec '{commands}'
-command mode (executes commands)
+ command mode (executes commands)
 .P
-For example,
+ For example,
 .B bim -e 'prn 2+2'
-will output:
-4
+ will output:
+ 4
 .TP
 .B -s , --stdin
 execute from stdin
@@ -26,7 +26,7 @@ For example,
 .B echo "2+2" |bim -s
 will output:
 4
-TP
+.TP
 .B -f <file>, --file <file>
 execute file script.
 .TP

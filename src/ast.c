@@ -142,6 +142,7 @@ void del_atom(_object *obj){
 	free(obj);
 }
 void del_cascade(_object *obj){
+	if(obj==NULL) return;
 	if(IS_PAIR(obj)){
 		del_cascade(car(obj));
 		del_cascade(cdr(obj));

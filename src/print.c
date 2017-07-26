@@ -163,7 +163,7 @@ void print_obj(_object *obj){
 		printf("()");
 	}
 	else{
-		printf("u?\n");
+		fprintf(stderr,"u?\n");
 	}
 }
 void display_obj(_object *obj){
@@ -181,11 +181,11 @@ void display_obj(_object *obj){
 			print_func(obj);
 		}
 		else{
-			printf("u?\n");
+			fprintf(stderr,"u?\n");
 		}
 	}
 	else{
-		printf("u?\n");
+		fprintf(stderr,"u?\n");
 	}
 }
 void print_list(_object *obj){
@@ -259,12 +259,12 @@ object_t *type_proc(object_t *obj){
 			return new_atom_s("function");
 		}
 		else{
-			printf("u?\n");
+			fprintf(stderr,"u?\n");
 			return bottom;
 		}
 	}
 	else{
-		printf("u?\n");
+		fprintf(stderr,"u?\n");
 		return bottom;
 	}
 	return bottom;
@@ -278,4 +278,10 @@ object_t *prn_proc(object_t *obj){
 		x=cdr(x);
 	}
 	return ok_symbol;
+}
+void clean_print_obj(_object *obj){
+	if(!obj) return;
+	if(IS_BOTTOM(obj)) return;
+	if(IS_ATOM(obj) && obj->type==t_symbol && (strcmp(obj->data.symbol.value,"__ok__")==0)) return;
+	print_obj(obj);
 }

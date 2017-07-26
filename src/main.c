@@ -133,12 +133,12 @@ int main(int argc,char **argv)
 		free(buff);
 		exit(0);
 	}
-	if(action.shell)
-	{
+	//if(action.shell)
+	//{
 		usage_b();
 		shell();
 		printf("Bye.\n");
-	}
-	usage_b();
+	//}
+	//usage_b();
 	return 0;
 }

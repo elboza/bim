@@ -112,8 +112,8 @@ void run_exec(char *buff)
 	int x=yyparse(&ast);
 	yylex_destroy();
 	if(x==0 && ast!=NULL){
-		//print_obj(run(ast,the_global_environment));
-		run(ast,the_global_environment);
+		clean_print_obj(run(ast,the_global_environment));
+		//run(ast,the_global_environment);
 	}
 	del_cascade(ast);
 	
@@ -129,8 +129,8 @@ void run_script(char *file)
 	int x=yyparse(&ast);
 	yylex_destroy();
 	if(x==0 && ast!=NULL){
-		//print_obj(run(ast,the_global_environment));
-		run(ast,the_global_environment);
+		clean_print_obj(run(ast,the_global_environment));
+		//run(ast,the_global_environment);
 	}
 	del_cascade(ast);
 	fclose(fp);
