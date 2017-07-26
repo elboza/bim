@@ -46,7 +46,8 @@ void usage_b()
 void parse_args(int argc,char **argv,struct m_action *action,char **buff,char *filename)
 {
 	//char *s1;
-	int c,len;
+	int c;
+	//int len;
 	action->shell=0;
 	action->file=0;
 	action->exec=0;
@@ -85,7 +86,8 @@ void parse_args(int argc,char **argv,struct m_action *action,char **buff,char *f
 				action->stdin=1;
 				*buff=(char*)malloc(MAX_CMD_LEN);
 				if(!*buff) {fprintf(stderr,"error allocating mem..."); exit(1);}
-				len=read(STDIN_FILENO,*buff,MAX_CMD_LEN);
+				//len=read(STDIN_FILENO,*buff,MAX_CMD_LEN);
+				read(STDIN_FILENO,*buff,MAX_CMD_LEN);
 				freopen("/dev/tty","rb",stdin); //reset stdin
 				break;
 			case 'e':

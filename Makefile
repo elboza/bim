@@ -21,6 +21,7 @@ clean:
 	if [ -d ${DIST_DIR} ]; then rmdir ${DIST_DIR}; fi
 	$(MAKE) -C src clean
 	$(MAKE) -C doc clean
+
 install:
 	echo "installing ${TARGET} to ${DESTDIR}${BINDIR}"
 	mkdir -p ${DESTDIR}${BINDIR}
@@ -42,8 +43,9 @@ dist:
 	cp README.md ${DIST_DIR}/
 	cp ChangeLog ${DIST_DIR}/
 	cp LICENCE ${DIST_DIR}/
-	mkdir -p ${DIST_DIR}/media
-	cp media/* ${DIST_DIR}/media/
+	cp AUTHORS ${DIST_DIR}/
+	#mkdir -p ${DIST_DIR}/media
+	#cp media/* ${DIST_DIR}/media/
 	mkdir -p ${DIST_DIR}/doc
 	cp -p ${DOC_DIR}/* ${DIST_DIR}/${DOC_DIR}/
 	COPYFILE_DISABLE=1 tar -cvzf ${TARGET}-${VERSION}.tar.gz ${DIST_DIR}/
