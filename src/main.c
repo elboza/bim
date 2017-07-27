@@ -119,18 +119,18 @@ int main(int argc,char **argv)
 	parse_args(argc,argv,&action,&buff,&filename[0]);
 	
 	if(action.file){
-		printf("file...%s\n",filename);
+		//printf("file...%s\n",filename);
 		run_script(filename);
 		exit(0);
 	}
 	if(action.exec){
-		printf("exec...%s\n",buff);
+		//printf("exec...%s\n",buff);
 		run_exec(buff);
 		free(buff);
 		exit(0);
 	}
 	if(action.stdin){
-		printf("stdin...\n");
+		//printf("stdin...\n");
 		run_exec(buff);
 		free(buff);
 		exit(0);
