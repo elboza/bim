@@ -62,6 +62,7 @@ void shell()
 	//if(check_funny()) funny_shell_disclaimer(); else normal_shell_disclaimer();
 	reset_stdin();
 	printf("entering shell-interactive mode...\n");
+	printf("type 'quit' or 'exit' to quit.\n");
 	rl_variable_bind("blink-match-paren","on");
 	while(!quit_shell)
 	{
