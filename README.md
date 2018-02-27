@@ -38,6 +38,7 @@ read the [bim man page](doc/xbim.man.html)
 ```
 2                                #number
 0xfe                             # hex number
+0b1010                           #binary
 2.2                              #number
 "foo"                            #interpolated string
 'foo'                            #simple string

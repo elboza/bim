@@ -12,6 +12,7 @@ unsigned int lang_mx;
 %}
 
 digit [0-9]
+bindigit [0-1]
 letter [a-zA-Z_]
 hexletter [a-fA-F]
 comment \/\/
@@ -34,6 +35,11 @@ newline \n
 0x({digit}|{hexletter})+	{
 				sscanf(yytext+2, "%X", &lang_mx);
 				yylval.int_val=lang_mx;
+				return INTEGER;
+			}
+
+0b({bindigit})+	{
+        yylval.int_val = (int) strtol(yytext+2, NULL, 2);
 				return INTEGER;
 			}
 
