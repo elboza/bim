@@ -157,9 +157,19 @@ object_t *neg_proc(object_t *arguments){
 	return new_atom_i(result);
 }
 object_t *div_proc(object_t *arguments) {
-	if(are_float_args(arguments)){
+	if(IS_FLOAT(car(arguments)) && IS_FLOAT(cadr(arguments))){
 		return new_atom_f(
 			(float)((car(arguments) )->data.dotted.value)/(float)
+			((cadr(arguments))->data.dotted.value));
+	}
+	if(IS_FLOAT(car(arguments)) && !IS_FLOAT(cadr(arguments))){
+		return new_atom_f(
+			(float)((car(arguments) )->data.dotted.value)/(float)
+			((cadr(arguments))->data.fixnum.value));
+	}
+	if(!IS_FLOAT(car(arguments)) && IS_FLOAT(cadr(arguments))){
+		return new_atom_f(
+			(float)((car(arguments) )->data.fixnum.value)/(float)
 			((cadr(arguments))->data.dotted.value));
 	}
 	else{

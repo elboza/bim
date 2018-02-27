@@ -64,17 +64,17 @@ sexprlist: sexpr ';' sexprlist {$$=cons($1,$3);} | sexpr {$$=cons($1,new_empty_l
 
 sexpr: fn {$$=$1;} | object {$$=$1;}
 
-fn: 	QUIT							{quit_shell=1;$$=NULL;YYACCEPT;}
-		|LET symbol '=' object						{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
+fn: 	QUIT					{quit_shell=1;$$=NULL;YYACCEPT;}
+		|LET symbol '=' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
 		|symbol '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-		|LET symbol ':' object						{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
-		|symbol ':' object						{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
+		|LET symbol ':' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
+		|symbol ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
 		|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($4,cons($2,cons($7,new_empty_list()))));}
 		|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}
 		|LET symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}
 		|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
-		|PRN printlist					{$$=cons(new_atom_s("__prn__"),$2);}
-		|TYPE sexpr					{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
+		|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
+		|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
 		|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
 		|WHILE '(' bexpr ')' sexpr {$$=cons(new_atom_s("__while__"),cons($3,cons($5,new_empty_list())));}
 		|blockcode {$$=$1;}
