@@ -1,160 +1,264 @@
-<HTML>
-<BODY>
-<PRE>
-<!-- Manpage converted by man2html 3.0.1 -->
+Content-type: text/html; charset=UTF-8
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><HEAD><TITLE>Man page of bim</TITLE>
+</HEAD><BODY>
+<H1>bim</H1>
+Section: User Commands  (1)<BR>Updated: (c) 2017 Fernando Iazeolla<BR><A HREF="#index">Index</A>
+<A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+bim - Bc IMprooved.
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>bim [ options ] [ file ]</B>
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<B>bim</B>
+
 bim takes the idea from bc (linux command line basic calculator) and shift it in to a modern context. bim is designed to evolve into a modern scripting language.
-.SH OPTIONS
-.TP
-.B -i, --interactive, --shell
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-i, --interactive, --shell</B>
+
+<DD>
 interactive (shell mode)
-.TP
-.B -e '{commands}', --exec '{commands}'
- command mode (executes commands)
-.P
- For example,
-.B bim -e 'prn 2+2'
- will output:
- 4
-.TP
-.B -s , --stdin
+<DT><B>-e '{commands}', --exec '{commands}'</B>
+
+<DD>
+<BR>&nbsp;command&nbsp;mode&nbsp;(executes&nbsp;commands)
+</DL>
+<P>
+
+<BR>&nbsp;For&nbsp;example,
+<B>bim -e 'prn 2+2'</B>
+
+<BR>&nbsp;will&nbsp;output:
+<BR>&nbsp;4
+<DL COMPACT>
+<DT><B>-s , --stdin</B>
+
+<DD>
 execute from stdin
-.P
+</DL>
+<P>
+
 For example,
-.B echo "2+2" |bim -s
+<B>echo 2+2 |bim -s</B>
+
 will output:
 4
-.TP
-.B -f &lt;file&gt;, --file &lt;file&gt;
+<DL COMPACT>
+<DT><B>-f &lt;file&gt;, --file &lt;file&gt;</B>
+
+<DD>
 execute file script.
-.TP
-.B -h, --help
+<DT><B>-h, --help</B>
+
+<DD>
 print usage info
-.TP
-.B -v, --version
+<DT><B>-v, --version</B>
+
+<DD>
 show bim's version number
-.SH THE LANGUAGE
-.TP
-.B Comments
+</DL>
+<A NAME="lbAF">&nbsp;</A>
+<H2>THE LANGUAGE</H2>
+
+<DL COMPACT>
+<DT><B>Comments</B>
+
+<DD>
 #this is a comment
-.TP
-.B data types
+<DT><B>data types</B>
 
- 2                                #number
- 0xfe                             # hex number
- 0b1010                           #binary
- 2.2                              #number
- "foo"                            #interpolated string
- 'foo'                            #simple string
- [1,2,3,4]                        #list
- [0x23,"foo",12]                  #list
- {'foo':2,'bar':3}                #hash
- {'index1':"foo",'index2':'foo2'} #hash
+<DD>
+<P>
+<BR>&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#number
+<BR>&nbsp;0xfe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;hex&nbsp;number
+<BR>&nbsp;0b1010&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#binary
+<BR>&nbsp;2.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#number
+<BR>&nbsp;&quot;foo&quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#interpolated&nbsp;string
+<BR>&nbsp;'foo'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#simple&nbsp;string
+<BR>&nbsp;[1,2,3,4]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#list
+<BR>&nbsp;[0x23,&quot;foo&quot;,12]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#list
+<BR>&nbsp;{'foo':2,'bar':3}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#hash
+<BR>&nbsp;{'index1':&quot;foo&quot;,'index2':'foo2'}&nbsp;#hash
+<P>
+<DT><B>variables assigning and accessing</B>
 
-.TP
-.B variables assigning and accessing
+<DD>
+<P>
+<BR>&nbsp;a=&quot;foo&quot;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#a&nbsp;=&nbsp;string&nbsp;'foo'
+<BR>&nbsp;a[1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;'o'
+<BR>&nbsp;a=2+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4
+<BR>&nbsp;a='foo'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;'foo'
+<BR>&nbsp;a[0]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;'f'
+<BR>&nbsp;a=0xfe&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#254
+<BR>&nbsp;a=[1,2,3,4,5,6]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#a&nbsp;is&nbsp;a&nbsp;list
+<BR>&nbsp;count(a)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;6&nbsp;(number&nbsp;of&nbsp;elements)
+<BR>&nbsp;a[3]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4
+<BR>&nbsp;a[-1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;6
+<BR>&nbsp;a[2:5]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;[3,4,5,6]
+<BR>&nbsp;a[:3]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;[1,2,3,4]
+<BR>&nbsp;a[3:]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;[4,5,6]
+<BR>&nbsp;a={'foo':2,'bar':3}&nbsp;#&nbsp;a&nbsp;is&nbsp;a&nbsp;hash
+<BR>&nbsp;count(a)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;2&nbsp;(number&nbsp;of&nbsp;elements)
+<BR>&nbsp;a['foo']&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;2
+<BR>&nbsp;^a=4<TT>&nbsp;&nbsp;&nbsp;</TT><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>#&nbsp;assign&nbsp;global&nbsp;var&nbsp;a&nbsp;(^&nbsp;refers&nbsp;to&nbsp;global&nbsp;vars&nbsp;...&nbsp;see&nbsp;functions&nbsp;section).<BR>
+<P>
+<DT><B>arithmetic and boolean opertions</B>
 
- a="foo"             #a = string 'foo'
- a[1]                # 'o'
- ^a=4				# assign global var a (^ refers to global vars ... see functions section).
+<DD>
+<P>
+<BR>&nbsp;2+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4
+<BR>&nbsp;2+3.1&nbsp;&nbsp;&nbsp;#&nbsp;5.1
+<BR>&nbsp;2-2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;0
+<BR>&nbsp;2--2&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4&nbsp;...&nbsp;2-(-2)&nbsp;:)
+<BR>&nbsp;2---2&nbsp;&nbsp;&nbsp;#&nbsp;0&nbsp;...&nbsp;2-(-(-2))
+<BR>&nbsp;2+3*4&nbsp;&nbsp;&nbsp;#&nbsp;14
+<BR>&nbsp;(2+3)*4&nbsp;#&nbsp;20
+<BR>&nbsp;6/3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;2
+<BR>&nbsp;6/5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;1.2
+<BR>&nbsp;#t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;true
+<BR>&nbsp;#f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;false
+<BR>&nbsp;!#t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;false&nbsp;(not&nbsp;true)
+<BR>&nbsp;!#f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;true&nbsp;&nbsp;(not&nbsp;false)
+<BR>&nbsp;2&lt;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#t
+<BR>&nbsp;2==2&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#t
+<BR>&nbsp;2==3&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#f
+<BR>&nbsp;2&gt;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#f
+<BR>&nbsp;2&lt;=3&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#t
+<BR>&nbsp;2&gt;=3&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#f
+<BR>&nbsp;2!=3&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#t
+<BR>&nbsp;2!=2&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;#f
+<BR>&nbsp;!(2&lt;3)&nbsp;&nbsp;#&nbsp;#f
+<P>
+<DT><B>conditionals</B>
 
-.TP
-.B arithmetic and boolean opertions
+<DD>
+<P>
+<BR>&nbsp;if(#t)&nbsp;#t&nbsp;else&nbsp;#f
+<BR>&nbsp;if(2!=2)&nbsp;{prn&nbsp;&quot;this&nbsp;is&nbsp;not&nbsp;executed;&nbsp;prn&nbsp;&quot;foo&quot;}&nbsp;else&nbsp;{prn&nbsp;&quot;multiple&nbsp;commands&nbsp;can&nbsp;be&nbsp;wrapped&nbsp;in&nbsp;block&nbsp;code&nbsp;curly&nbsp;brackets&quot;}
+<P>
+<DT><B>looping</B>
 
- 2+2     # 4
- 2+3.1   # 5.1
- 2-2     # 0
- 2--2    # 4 ... 2-(-2) :)
- 2---2   # 0 ... 2-(-(-2))
- 2+3*4   # 14
- (2+3)*4 # 20
- 6/3     # 2
- 6/5     # 1.2
- #t      # true
- #f      # false
- !#t     # false (not true)
- !#f     # true  (not false)
- 2&lt;3     # #t
- 2==2    # #t
- 2==3    # #f
- 2&gt;3     # #f
- 2&lt;=3    # #t
- 2&gt;=3    # #f
- 2!=3    # #t
- 2!=2    # #f
- !(2&lt;3)  # #f
+<DD>
+<P>
+<BR>&nbsp;a=1;
+<BR>&nbsp;while(a&lt;=10){
+<BR>&nbsp;<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>prn&nbsp;a,&quot;;<BR>
+<BR>&nbsp;<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>a=a+1;<BR>
+<BR>&nbsp;}
+<P>
+<DT><B>output</B>
 
-.TP
-.B conditionals
+<DD>
+<P>
+<BR>&nbsp;prn&nbsp;&quot;list&nbsp;params...&quot;,1,2,3,&quot;foo&quot;,&quot;;
+<BR>&nbsp;print(&quot;list&nbsp;params...&quot;,1,2,3,&quot;foo&quot;,&quot;);
+<P>
+<DT><B>functions</B>
 
- if(#t) #t else #f
- if(2!=2) {prn "this is not executed\n"; prn "foo"} else {prn "multiple commands can be wrapped in block code curly brackets"}
+<DD>
+<P>
+<BR>&nbsp;\x.x+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#lambda&nbsp;(anonymous&nbsp;function)
+<BR>&nbsp;\x.x+1-&gt;(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#lambda&nbsp;function&nbsp;with&nbsp;application.&nbsp;returns&nbsp;4
+<BR>&nbsp;\x.{x+1}-&gt;(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#same
+<BR>&nbsp;\x,y.{x+y}-&gt;(2,3)&nbsp;#5
+<BR>&nbsp;\x.{y=3;x+y;prn&nbsp;&quot;done;}-&gt;(2)
+<BR>&nbsp;f=\x.x+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#assign&nbsp;function&nbsp;to&nbsp;f
+<BR>&nbsp;f-&gt;(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4&nbsp;(function&nbsp;application)
+<BR>&nbsp;<A HREF="/cgi-bin/man/man2html?3+f">f</A>(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4&nbsp;(shortcut&nbsp;for&nbsp;func&nbsp;apply)
+<BR>&nbsp;f:\x.x+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;you&nbsp;ca&nbsp;assign&nbsp;a&nbsp;function&nbsp;either&nbsp;with&nbsp;'='&nbsp;or&nbsp;':'
+<BR>&nbsp;f-&gt;(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4&nbsp;(func&nbsp;application)
+<BR>&nbsp;<A HREF="/cgi-bin/man/man2html?3+f">f</A>(3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;4&nbsp;(shortcut&nbsp;for&nbsp;func&nbsp;apply)
+<BR>&nbsp;f:\_.prn&nbsp;&quot;the&nbsp;_&nbsp;ignore&nbsp;the&nbsp;parameter&quot;&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;if&nbsp;you&nbsp;want&nbsp;to&nbsp;ignore&nbsp;a&nbsp;var&nbsp;you&nbsp;ca&nbsp;use&nbsp;the&nbsp;'_'&nbsp;unsderscore&nbsp;sign&nbsp;as&nbsp;a&nbsp;var&nbsp;name
+<BR>&nbsp;f()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;func&nbsp;application&nbsp;with&nbsp;no&nbsp;params
+<BR>&nbsp;y=5;\x.{x+^y}-&gt;(2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#7&nbsp;(^&nbsp;refers&nbsp;to&nbsp;global&nbsp;var)
+<BR>&nbsp;y=5;\x.{y=1;x+y+^y}-&gt;(2)&nbsp;#8&nbsp;
+<P>
+<BR>&nbsp;f:\x.{if(x==1)&nbsp;1&nbsp;else&nbsp;x*f(x-1)}&nbsp;#fibonacci&nbsp;func
+<BR>&nbsp;<A HREF="/cgi-bin/man/man2html?5+f">f</A>(5)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;120
+<P>
+<DT><B>debug</B>
 
-.TP
-.B looping
+<DD>
+<P>
+<BR>&nbsp;in&nbsp;the&nbsp;repl&nbsp;you&nbsp;can&nbsp;change&nbsp;the&nbsp;var&nbsp;of&nbsp;`__debug__`&nbsp;var&nbsp;to&nbsp;`#t`&nbsp;to&nbsp;debug&nbsp;and&nbsp;inspect&nbsp;internal&nbsp;sturctures.
+<P>
+<DT><B>last eval var</B>
 
- a=1;
- while(a&lt;=10){
- 	prn a,"\n";
- 	a=a+1;
- }
+<DD>
+<P>
+the last evaluated expression is stored in the special variable `$!` and you can use it in any way as a normal var in an expression.
+<P>
+<DT><B>TODO</B>
 
-.TP
-.B output
+<DD>
+<P>
+<BR>&nbsp;*&nbsp;lambda&nbsp;recursion
+<BR>&nbsp;*&nbsp;var&nbsp;namespaces
+<BR>&nbsp;*&nbsp;IO&nbsp;socket
+<BR>&nbsp;*&nbsp;IO&nbsp;files/disk
+<BR>&nbsp;*&nbsp;JSON&nbsp;encode/decode
+<BR>&nbsp;*&nbsp;DB&nbsp;SQL&nbsp;interact
+<BR>&nbsp;*&nbsp;foreach&nbsp;-&nbsp;list&nbsp;and&nbsp;hash&nbsp;loop
+<P>
+</DL>
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
 
- prn "list params...",1,2,3,"foo","\n";
- print("list params...",1,2,3,"foo","\n");
+<A HREF="/cgi-bin/man/man2html?1+bc">bc</A>(1), <A HREF="/cgi-bin/man/man2html?1+bim">bim</A>(1)
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
 
-.TP
-.B functions
-
- y=5;\\x.{x+^y}-&gt;(2)       #7 (^ refers to global var)
- y=5;\\x.{y=1;x+y+^y}-&gt;(2) #8 
-
- f:\\x.{if(x==1) 1 else x*f(x-1)} #fibonacci func
- <B>f(5)</B>                     # 120
-
-.TP
-.B debug
-
- in the repl you can change the var of `__debug__` var to `#t` to debug and inspect internal sturctures.
-
-.TP
-.B TODO
-
- * lambda recursion
- * var namespaces
- * IO socket
- * IO files/disk
- * JSON encode/decode
- * DB SQL interact
- * foreach - list and hash loop
-
-.SH SEE ALSO
-<B>bc(1)</B>, <B>bim(1)</B>
-.SH AUTHOR
-.nf
+<PRE>
 Fernando Iazeolla &lt; fernando.iazeolla_FOobAr_gmail_Baz_com, by replacing _fOoBar_ with a @ and _Baz_ with a . &gt; - founder &amp; core developer.
-.SH COPYRIGHT
-.nf
+</PRE><A NAME="lbAI">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+<PRE>
 Copyright (C) 2017 Fernando Iazeolla &lt; fernando.iazeolla_FOobAr_gmail_Baz_com, by replacing _fOoBar_ with a @ and _Baz_ with a . &gt;
-.P
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
-.P
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-.P
+
 You should have received a copy of the GNU General Public License
-along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+along with this program. If not, see &lt;<A HREF="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</A>&gt;.
+
 </PRE>
 <HR>
-<ADDRESS>
-Man(1) output converted with
-<a href="http://www.oac.uci.edu/indiv/ehood/man2html.html">man2html</a>
-</ADDRESS>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">OPTIONS</A><DD>
+<DT><A HREF="#lbAF">THE LANGUAGE</A><DD>
+<DT><A HREF="#lbAG">SEE ALSO</A><DD>
+<DT><A HREF="#lbAH">AUTHOR</A><DD>
+<DT><A HREF="#lbAI">COPYRIGHT</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 19:54:36 GMT, April 01, 2018
 </BODY>
 </HTML>
