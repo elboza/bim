@@ -1,6 +1,8 @@
 
 ChangeLog:
 
+0.3.0:
+   added $! special var as the last evaluated expression.	
 0.2.1:
    fixed division operand type
 0.2:

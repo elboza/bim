@@ -150,6 +150,11 @@ show bim's version number
  in the repl you can change the var of `__debug__` var to `#t` to debug and inspect internal sturctures.
 
 .TP
+.B last eval var
+
+the last evaluated expression is stored in the special variable `$!` and you can use it in any way as a normal var in an expression.
+
+.TP
 .B TODO
 
  * lambda recursion

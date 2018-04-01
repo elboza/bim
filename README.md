@@ -152,6 +152,11 @@ f(5)                     # 120
 
 in the repl you can change the var of `__debug__` var to `#t` to debug and inspect internal sturctures.
 
+#### last eval var
+
+the last evaluated expression is stored in the special variable `$!` and you can use it in any way as a normal var in an expression.
+
+
 ### TODO
 
  * lambda recursion
