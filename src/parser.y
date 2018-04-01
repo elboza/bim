@@ -10,6 +10,7 @@
 #include"repl.h"
 #include "ast.h"
 #include "env.h"
+#include "special_vars.h"
 
 /* prototypes */
 int yylex(void);
@@ -29,7 +30,7 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY
+%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL
 %type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE
 //<int_val> expr
 //%left EQ
@@ -174,6 +175,7 @@ printlist: sexpr {$$=cons($1,new_empty_list());}
 
 
 symbol: WORD						{$$=new_atom_s($1);}
+	| LAST_EVAL_VAL {$$=new_atom_s("$!");}
 	|'^' WORD {$$=cons(new_atom_s("__global__"),cons(new_atom_s($2),new_empty_list()));}
 
 string: STRING {$$=new_atom_str_QQ($1);}

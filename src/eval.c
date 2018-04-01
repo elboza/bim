@@ -4,6 +4,7 @@
 #include "env.h"
 #include "eval.h"
 #include "print.h"
+#include "special_vars.h"
 
 char is_self_evaluating(object_t *exp) {
 	return IS_BOOLEAN(exp)   ||
@@ -538,6 +539,12 @@ tailcall:
     //exit(1);
 	return bottom;
 }
+void set_last_eval_var(object_t *val,object_t *env){
+    #define TYPEDEF_ENUM_LIMIT 50
+    if((int)val->type>TYPEDEF_ENUM_LIMIT) return;
+    object_t *xx=cons(new_atom_s("__assign__"),cons(new_atom_s("$!"),cons(val,new_empty_list())));
+    eval(xx,env);
+}
 object_t *run(object_t *ast,object_t *env){
 	object_t *car_obj,*cdr_obj,*ret;
 	car_obj=car(ast);
@@ -547,5 +554,6 @@ object_t *run(object_t *ast,object_t *env){
 		car_obj=car(cdr_obj);
 		cdr_obj=cdr(cdr_obj);
 	}
+    set_last_eval_var(ret,env);
 	return ret;
 }

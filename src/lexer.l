@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "parser.tab.h"
+#include "special_vars.h"
 void yyerror(struct _object **ast,char *s);
 int yywrap(void);
 unsigned int lang_mx;
@@ -67,6 +68,7 @@ newline \n
 ">>>"		return rot_r;
 "%%"		return REMINDER;
 "->"		return APPLY;
+"$!"		return LAST_EVAL_VAL;
 
 
 [-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£^] {
