@@ -540,10 +540,33 @@ tailcall:
 	return bottom;
 }
 void set_last_eval_var(object_t *val,object_t *env){
-    #define TYPEDEF_ENUM_LIMIT 50
-    if((int)val->type>TYPEDEF_ENUM_LIMIT) return;
-    object_t *xx=cons(new_atom_s("__assign__"),cons(new_atom_s("$!"),cons(val,new_empty_list())));
-    eval(xx,env);
+    //#define TYPEDEF_ENUM_LIMIT 50
+    //printf("%x\n",val->type);
+    //if((int)val->type>TYPEDEF_ENUM_LIMIT) return;
+    object_t *xx;
+    switch(val->type){
+        case T_PAIR:
+            xx=cons(new_atom_s("__assign__"),cons(new_atom_s("$!"),cons(val,new_empty_list())));
+            eval(xx,env);
+            break;
+        case t_symbol:
+            xx=cons(new_atom_s("__assign__"),cons(new_atom_s("$!"),cons(true,new_empty_list())));
+            eval(xx,env);
+            break;
+        case t_integer:
+        case t_float:
+        case t_string_qq:
+        case t_string_q:
+        case t_boolean:
+            xx=cons(new_atom_s("__assign__"),cons(new_atom_s("$!"),cons(val,new_empty_list())));
+            eval(xx,env);
+            break;
+        default:
+
+            break;
+    }
+    //object_t *xx=cons(new_atom_s("__assign__"),cons(new_atom_s("$!"),cons(val,new_empty_list())));
+    //eval(xx,env);
 }
 object_t *run(object_t *ast,object_t *env){
 	object_t *car_obj,*cdr_obj,*ret;
