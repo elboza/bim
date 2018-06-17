@@ -53,33 +53,34 @@ void yyerror(struct _object **ast,char *s);
 
 lisp:	sexprlist {*ast=$1;YYACCEPT;}
 
-object:	/*symbol {$$=$1;}
-		|*/bexpr {$$=$1;}
-		|expr {$$=$1;}
-		|string {$$=$1;}
-		|lambda {$$=$1;}
-		|list {$$=$1;}
-		|hash {$$=$1;}
+object:	
+	bexpr {$$=$1;}
+	|expr {$$=$1;}
+	|string {$$=$1;}
+	|lambda {$$=$1;}
+	|list {$$=$1;}
+	|hash {$$=$1;}
 
 sexprlist: sexpr ';' sexprlist {$$=cons($1,$3);} | sexpr {$$=cons($1,new_empty_list());}|{$$=new_empty_list();}
 
 sexpr: fn {$$=$1;} | object {$$=$1;}
 
-fn: 	QUIT					{quit_shell=1;$$=NULL;YYACCEPT;}
-		|LET symbol '=' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
-		|symbol '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-		|LET symbol ':' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
-		|symbol ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-		|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($4,cons($2,cons($7,new_empty_list()))));}
-		|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}
-		|LET symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}
-		|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
-		|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
-		|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
-		|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
-		|WHILE '(' bexpr ')' sexpr {$$=cons(new_atom_s("__while__"),cons($3,cons($5,new_empty_list())));}
-		|blockcode {$$=$1;}
-		/*| {$$=new_empty_list();}*/
+fn: 	
+	QUIT	{quit_shell=1;$$=NULL;YYACCEPT;}
+	|LET symbol '=' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
+	|symbol '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
+	|LET symbol ':' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
+	|symbol ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
+	|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($4,cons($2,cons($7,new_empty_list()))));}
+	|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}
+	|LET symbol '.' hashpicker '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($6,new_empty_list()))));}
+	|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
+	|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
+	|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
+	|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
+	|WHILE '(' bexpr ')' sexpr {$$=cons(new_atom_s("__while__"),cons($3,cons($5,new_empty_list())));}
+	|blockcode {$$=$1;}
+	/*| {$$=new_empty_list();}*/
 
 blockcode: '{' sexprlist '}' {$$=cons(new_atom_s("__progn__"),$2);}
 
@@ -104,7 +105,7 @@ expr:	number		{$$=$1;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
 	| func_application {$$=$1;}
 	| symbol '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
-	| symbol '[' hashpicker ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+	| symbol '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
 
 /*op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}*/
 
@@ -157,6 +158,7 @@ listitems: object {$$=cons($1,new_empty_list());}
 hash: '{' hashitems '}' {$$=cons(new_atom_s("__hash__"),$2);}
 
 hashitem: string ':' object {$$=cons($1,cons($3,new_empty_list()));}
+	| WORD ':' object {$$=cons(new_atom_s($1),cons($3,new_empty_list()));}
 
 hashitems: hashitem {$$=cons($1,new_empty_list());}
 	|hashitem ',' hashitems {$$=cons($1,$3);}
@@ -168,7 +170,7 @@ listpicker:
 	| expr ':' {$$=cons(new_atom_s("__list_range__"),cons($1,cons(new_atom_i(-1),new_empty_list())));}
 
 hashpicker:
-	string {$$=$1;}
+	WORD {$$=new_atom_s($1);}
 
 printlist: sexpr {$$=cons($1,new_empty_list());}
 	| sexpr ',' printlist {$$=cons($1,$3);}
