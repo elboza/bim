@@ -17,7 +17,6 @@ int yylex(void);
 extern char *yytext;
 extern int yylineno;
 void yyerror(struct _object **ast,char *s);
-//int sym[26];                    /* symbol table */
 %}
 
 %union {
@@ -31,7 +30,7 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
 %token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list
 //<int_val> expr
 //%left EQ
 %right APPLY
@@ -51,7 +50,8 @@ void yyerror(struct _object **ast,char *s);
 %parse-param{struct _object **ast}
 %%
 
-lisp:	sexprlist {*ast=$1;YYACCEPT;}
+lisp:
+	sexprlist {*ast=$1;YYACCEPT;}
 
 object:	
 	bexpr {$$=$1;}
@@ -61,9 +61,12 @@ object:
 	|list {$$=$1;}
 	|hash {$$=$1;}
 
-sexprlist: sexpr ';' sexprlist {$$=cons($1,$3);} | sexpr {$$=cons($1,new_empty_list());}|{$$=new_empty_list();}
+sexprlist: 
+	sexpr ';' sexprlist {$$=cons($1,$3);} | sexpr {$$=cons($1,new_empty_list());}|{$$=new_empty_list();}
 
-sexpr: fn {$$=$1;} | object {$$=$1;}
+sexpr: 
+	fn {$$=$1;} 
+	| object {$$=$1;}
 
 fn: 	
 	QUIT	{quit_shell=1;$$=NULL;YYACCEPT;}
@@ -74,7 +77,9 @@ fn:
 	|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($4,cons($2,cons($7,new_empty_list()))));}
 	|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}
 	|LET symbol '.' hashpicker '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($6,new_empty_list()))));}
-	|symbol '[' hashpicker ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
+	|LET symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}
+	|symbol '.' hashpicker '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($5,new_empty_list()))));}
+	|symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
 	|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
 	|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
 	|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
@@ -82,7 +87,8 @@ fn:
 	|blockcode {$$=$1;}
 	/*| {$$=new_empty_list();}*/
 
-blockcode: '{' sexprlist '}' {$$=cons(new_atom_s("__progn__"),$2);}
+blockcode: 
+	'{' sexprlist '}' {$$=cons(new_atom_s("__progn__"),$2);}
 
 expr:	number		{$$=$1;}
 	| symbol {$$=$1;}
@@ -106,10 +112,13 @@ expr:	number		{$$=$1;}
 	| func_application {$$=$1;}
 	| symbol '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
 	| symbol '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+	| symbol '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+/*	| hashpicker_list {$$=$1;} */
 
 /*op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}*/
 
-bexpr: boolean {$$=$1;}
+bexpr: 
+	boolean {$$=$1;}
 	/*|expr {$$=$1;}*/
 	|'(' bexpr ')' {$$=$2;}
 	|bexpr AND bexpr {$$=cons(new_atom_s("__and__"),cons($1,cons($3,new_empty_list())));}
@@ -124,12 +133,14 @@ bexpr: boolean {$$=$1;}
 	|bexpr NEQ bexpr {$$=cons(new_atom_s("__neq__"),cons($1,cons($3,new_empty_list())));}
 	|'!' bexpr  %prec NOT {$$=cons(new_atom_s("__not__"),cons($2,new_empty_list()));}
 
-MAYBEELSE: ELSE sexpr %prec ELSE{$$=$2;}
+MAYBEELSE: 
+	ELSE sexpr %prec ELSE{$$=$2;}
 	/*|';' ELSE sexpr %prec ELSE{$$=$3;}*/
 	| %prec THEN{$$=new_empty_list();}
 
-number:	INTEGER							{$$=new_atom_i($1);}
-		|FLOAT							{$$=new_atom_f($1);}
+number:	
+	INTEGER {$$=new_atom_i($1);}
+	|FLOAT {$$=new_atom_f($1);}
 
 lambda:
 	'\\' LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}
@@ -142,25 +153,32 @@ LAMBDA_PARAMS:
 LAMBDA_BODY:
 	sexpr {$$=$1;}
 
-func_application: symbol '(' func_args ')' {/*$$=cons(new_atom_s("__apply__"),cons($1,$3));*/$$=cons($1,$3);}
+func_application: 
+	symbol '(' func_args ')' {/*$$=cons(new_atom_s("__apply__"),cons($1,$3));*/$$=cons($1,$3);}
 	| lambda APPLY '(' func_args ')' {$$=cons($1,$4);}
 	| symbol APPLY '(' func_args ')' {$$=cons($1,$4);}
 
-func_args: object {$$=cons($1,new_empty_list());}
+func_args: 
+	object {$$=cons($1,new_empty_list());}
 	|object ',' func_args {$$=cons($1,$3);}
 	|{$$=new_empty_list();}
 
-list: '[' listitems ']' {$$=cons(new_atom_s("__list__"),$2);}
+list: 
+	'[' listitems ']' {$$=cons(new_atom_s("__list__"),$2);}
 
-listitems: object {$$=cons($1,new_empty_list());}
+listitems: 
+	object {$$=cons($1,new_empty_list());}
 	| object ',' listitems {$$=cons($1,$3);}
 
-hash: '{' hashitems '}' {$$=cons(new_atom_s("__hash__"),$2);}
+hash: 
+	'{' hashitems '}' {$$=cons(new_atom_s("__hash__"),$2);}
 
-hashitem: string ':' object {$$=cons($1,cons($3,new_empty_list()));}
-	| WORD ':' object {$$=cons(new_atom_s($1),cons($3,new_empty_list()));}
+hashitem: 
+	string ':' object {$$=cons($1,cons($3,new_empty_list()));}
+	| WORD ':' object {$$=cons(new_atom_str_Q($1),cons($3,new_empty_list()));}
 
-hashitems: hashitem {$$=cons($1,new_empty_list());}
+hashitems: 
+	hashitem {$$=cons($1,new_empty_list());}
 	|hashitem ',' hashitems {$$=cons($1,$3);}
 
 listpicker:
@@ -170,21 +188,35 @@ listpicker:
 	| expr ':' {$$=cons(new_atom_s("__list_range__"),cons($1,cons(new_atom_i(-1),new_empty_list())));}
 
 hashpicker:
-	WORD {$$=new_atom_s($1);}
+	WORD {$$=new_atom_str_Q($1);}
 
-printlist: sexpr {$$=cons($1,new_empty_list());}
+hashpicker_str:
+	string {$$=$1;}
+
+hashpicker_list:
+	/*empty*/
+	hashpicker_list '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+	| hashpicker_list '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+/*	| hashpicker {$$=$1;}
+	| hashpicker_str {$$=$1;}*/
+
+printlist: 
+	sexpr {$$=cons($1,new_empty_list());}
 	| sexpr ',' printlist {$$=cons($1,$3);}
 
 
-symbol: WORD						{$$=new_atom_s($1);}
+symbol: 
+	WORD {$$=new_atom_s($1);}
 	| LAST_EVAL_VAL {$$=new_atom_s("$!");}
 	|'^' WORD {$$=cons(new_atom_s("__global__"),cons(new_atom_s($2),new_empty_list()));}
 
-string: STRING {$$=new_atom_str_QQ($1);}
+string: 
+	STRING {$$=new_atom_str_QQ($1);}
 	|STRING2 {$$=new_atom_str_Q($1);}
 
-boolean:	TT							{$$=new_atom_b(1);}
-		|NIL							{$$=new_atom_b(0);}
+boolean:	
+	TT {$$=new_atom_b(1);}
+	|NIL {$$=new_atom_b(0);}
 
 %%
 

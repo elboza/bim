@@ -45,7 +45,9 @@ read the [bim man page](doc/xbim.man.html)
 [1,2,3,4]                        #list
 [0x23,"foo",12]                  #list
 {'foo':2,'bar':3}                #hash
+{foo:2,bar:3}                    #hash
 {'index1':"foo",'index2':'foo2'} #hash
+{index1:"foo",index2:'foo2'}     #hash
 
 ```
 
@@ -66,8 +68,10 @@ a[2:5]              # [3,4,5,6]
 a[:3]               # [1,2,3,4]
 a[3:]               # [4,5,6]
 a={'foo':2,'bar':3} # a is a hash
+a={foo:2,bar:3}     # a is a hash (keys without string quotes)
 count(a)            # 2 (number of elements)
 a['foo']            # 2
+a.foo               # 2
 ^a=4				# assign global var a (^ refers to global vars ... see functions section).
 
 ```

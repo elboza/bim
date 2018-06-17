@@ -55,6 +55,7 @@ object_t *eval_hash(object_t *exp,object_t *env){
     car_obj=cadr(exp);
     cdr_obj=cddr(exp);
     while(car_obj){ 
+		//ret=(car(car_obj));
         ret=eval(car(car_obj),env);//eval key !
         if(ret!=car(car_obj)){
             //printf("!");
