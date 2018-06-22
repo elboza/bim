@@ -78,7 +78,7 @@ fn:
 	|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}
 	|LET symbol '.' hashpicker '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($6,new_empty_list()))));}
 	|LET symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}
-	|symbol '.' hashpicker '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($5,new_empty_list()))));}
+/*	|symbol '.' hashpicker '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($5,new_empty_list()))));}*/
 	|symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
 	|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
 	|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
@@ -111,9 +111,9 @@ expr:	number		{$$=$1;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
 	| func_application {$$=$1;}
 	| symbol '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
-	| symbol '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
-	| symbol '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
-/*	| hashpicker_list {$$=$1;} */
+/*	| symbol '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+	| symbol '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}*/
+	| hashpicker_list {$$=$1;} 
 
 /*op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}*/
 
@@ -194,11 +194,15 @@ hashpicker_str:
 	string {$$=$1;}
 
 hashpicker_list:
-	/*empty*/
 	hashpicker_list '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
-	| hashpicker_list '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
-/*	| hashpicker {$$=$1;}
-	| hashpicker_str {$$=$1;}*/
+	| symbol {$$=$1;}
+
+/*
+namespace:
+	/*empty*./
+	| symbol {$$=$1;}
+	| namespace NAMESPACE symbol {$$=cons(new_atom_s("__namespace__"),cons($1,cons($3,new_empty_list())));}
+*/								 
 
 printlist: 
 	sexpr {$$=cons($1,new_empty_list());}
