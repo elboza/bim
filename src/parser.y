@@ -30,7 +30,7 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
 %token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list 
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list 
 //<int_val> expr
 //%left EQ
 %right APPLY
@@ -166,14 +166,18 @@ func_args:
 	|{$$=new_empty_list();}
 
 list: 
-	'[' listitems ']' {$$=cons_dl(new_atom_s("__list__"),$2);}
+	'[' listitems_orempty ']' {$$=cons_dl(new_atom_s("__list__"),$2);}
 
 listitems: 
 	object {$$=cons_dl($1,new_empty_list());}
 	| object ',' listitems {$$=cons_dl($1,$3);}
 
+listitems_orempty:
+	/*empty*/ {$$=new_empty_list();}
+	|listitems {$$=$1;}
+
 hash: 
-	'{' hashitems '}' {$$=cons_dl(new_atom_s("__hash__"),$2);}
+	'{' hashitems_orempty '}' {$$=cons_dl(new_atom_s("__hash__"),$2);}
 
 hashitem: 
 	string ':' object {$$=cons_dl($1,cons_dl($3,new_empty_list()));}
@@ -182,6 +186,10 @@ hashitem:
 hashitems: 
 	hashitem {$$=cons_dl($1,new_empty_list());}
 	|hashitem ',' hashitems {$$=cons_dl($1,$3);}
+
+hashitems_orempty:
+	/*empty*/ {$$=new_empty_list();}
+	|hashitems {$$=$1;}
 
 listpicker:
 	expr {$$=$1;}
