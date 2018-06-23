@@ -480,29 +480,33 @@ object_t *get_hash_proc(object_t *arguments){
 		if(strcmp(obj->data.string.value,key->data.string.value)==0) return cadar(list);
 		list=cdr(list);
 	}
-	return new_atom_bottom();
+	key->ancestor_dl=list->ancestor_dl;
+	key->ltype=T_BOTTOM;
+	return key;
 }
 int subst_node_tree(object_t *exnode,object_t *newnode){
-	exnode->ancestor->data.pair.car=newnode;
-	newnode->ancestor=exnode->ancestor;
+	exnode->ancestor_dl->data.pair.car=newnode;
+	newnode->ancestor_dl=exnode->ancestor_dl;
 	return 0;
 }
 int append_node_tree(object_t *exnode,object_t *newnode){
-	exnode->ancestor->data.pair.cdr=newnode;
-	newnode->ancestor=exnode->ancestor;
+	exnode->ancestor_dl->data.pair.cdr=newnode;
+	newnode->ancestor_dl=exnode->ancestor_dl;
 	return 0;
 }
 int add_node_last(object_t *lastnode,object_t *newnode){
 	object_t *list;
-	list=cdr(lastnode);
+	//list=cdr(lastnode);
+	list=lastnode;
 	//if(!is_hash(cadr(arguments))) return new_atom_bottom();
 	while(list && !is_the_empty_list(list)){
 		list=cdr(list);
 	}
-	return append_node_tree(list,cons(newnode,new_empty_list()));
+	return append_node_tree(list,cons_dl(newnode,new_empty_list()));
 }
 object_t *make_hash_node(object_t *key,object_t *val){
-	return cons(key,cons(val,new_empty_list()));
+	key->ltype=T_ATOM;
+	return cons_dl(key,cons_dl(val,new_empty_list()));
 }
 object_t *set_list_proc(object_t *arguments){
 	object_t *var,*val,*obj;
@@ -520,12 +524,12 @@ object_t *set_list_proc(object_t *arguments){
 	return ok_symbol;
 }
 object_t *set_hash_proc(object_t *arguments){
-	object_t *old_val,*new_val;
+	object_t *old_val,*new_val,*x;
 	//printf("set hash\n");
 	old_val=car(arguments);
 	new_val=cadr(arguments);
 	//reimplement add_node_last with correct vaules
-	//if(IS_BOTTOM(old_val)){add_node_last(var,make_hash_node(index,val));return ok_symbol;}
+	if(IS_BOTTOM(old_val)){x=old_val->ancestor_dl;add_node_last(x,make_hash_node(old_val,new_val));return ok_symbol;}
 	if(subst_node_tree(old_val,new_val)!=0) return bottom;
 	return ok_symbol;
 }

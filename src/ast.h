@@ -52,6 +52,7 @@ typedef struct _object{
 		}output_port;
 	}data;
 	struct _object *ancestor;
+	struct _object *ancestor_dl;
 } _object,object_t;
 
 #define IS_ATOM(x)    ((x)->ltype==T_ATOM)
@@ -78,6 +79,7 @@ _object* new_atom_str_Q(char *s);
 _object* new_atom_b(int ival);
 _object* new_atom_bottom(void);
 _object* cons(_object *first,_object *last);
+_object* cons_dl(_object *first,_object *last);
 _object* new_fn(_object *(*fn)(_object *arguments));
 _object* new_compound_fn(_object *parameters,_object *body,_object *env);
 void del_atom(_object *obj);

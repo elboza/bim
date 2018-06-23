@@ -166,22 +166,22 @@ func_args:
 	|{$$=new_empty_list();}
 
 list: 
-	'[' listitems ']' {$$=cons(new_atom_s("__list__"),$2);}
+	'[' listitems ']' {$$=cons_dl(new_atom_s("__list__"),$2);}
 
 listitems: 
-	object {$$=cons($1,new_empty_list());}
-	| object ',' listitems {$$=cons($1,$3);}
+	object {$$=cons_dl($1,new_empty_list());}
+	| object ',' listitems {$$=cons_dl($1,$3);}
 
 hash: 
-	'{' hashitems '}' {$$=cons(new_atom_s("__hash__"),$2);}
+	'{' hashitems '}' {$$=cons_dl(new_atom_s("__hash__"),$2);}
 
 hashitem: 
-	string ':' object {$$=cons($1,cons($3,new_empty_list()));}
-	| WORD ':' object {$$=cons(new_atom_str_Q($1),cons($3,new_empty_list()));}
+	string ':' object {$$=cons_dl($1,cons_dl($3,new_empty_list()));}
+	| WORD ':' object {$$=cons_dl(new_atom_str_Q($1),cons_dl($3,new_empty_list()));}
 
 hashitems: 
-	hashitem {$$=cons($1,new_empty_list());}
-	|hashitem ',' hashitems {$$=cons($1,$3);}
+	hashitem {$$=cons_dl($1,new_empty_list());}
+	|hashitem ',' hashitems {$$=cons_dl($1,$3);}
 
 listpicker:
 	expr {$$=$1;}

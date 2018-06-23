@@ -18,6 +18,7 @@ _object* new_object(void){
 	obj->data.pair.car=NULL;
 	obj->data.pair.cdr=NULL;
 	obj->ancestor=NULL;
+	obj->ancestor_dl=NULL;
 	return obj;
 }
 _object* new_atom_i(int ival){
@@ -86,7 +87,20 @@ _object* cons(_object *first,_object *last){
 	last->ancestor=obj;
 	return obj;
 }
-_object* new_fn(_object *(*fn)(_object *arguments)){
+_object* cons_dl(_object *first,_object *last){
+	_object *obj;
+	obj=new_object();
+	if(!obj) return NULL;
+	obj->ltype=T_CONS;
+	obj->type=T_PAIR;
+	obj->data.pair.car=first;
+	obj->data.pair.cdr=last;
+	first->ancestor=obj;
+	last->ancestor=obj;
+	first->ancestor_dl=obj;
+	last->ancestor_dl=obj;
+	return obj;
+}_object* new_fn(_object *(*fn)(_object *arguments)){
 	_object *obj;
 	obj=new_object();
 	if(!obj) return NULL;
