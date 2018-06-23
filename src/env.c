@@ -508,13 +508,14 @@ object_t *set_list_proc(object_t *arguments){
 	object_t *var,*val,*obj;
 	//printf("set list\n");
 	//index=car(arguments);
-	var=cadr(arguments);
-	val=caddr(arguments);
-	if(!is_list(var)){
+	var=car(arguments);
+	val=cadr(arguments);
+//	if(!is_list(var)){
 		//printf("not a list!!\n");
-		return bottom;
-	}
-	obj=get_list_proc(arguments);
+//		return bottom;
+//	}
+//	obj=get_list_proc(arguments);
+	obj=var;
 	if(subst_node_tree(obj,val)!=0) return bottom;
 	return ok_symbol;
 }

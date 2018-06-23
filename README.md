@@ -70,7 +70,7 @@ a[3:]               # [4,5,6]
 a={'foo':2,'bar':3} # a is a hash
 a={foo:2,bar:3}     # a is a hash (keys without string quotes)
 count(a)            # 2 (number of elements)
-a['foo']            # 2
+a~['foo']           # 2
 a.foo               # 2
 ^a=4				# assign global var a (^ refers to global vars ... see functions section).
 

@@ -30,7 +30,7 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
 %token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems hash hashitems hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list 
 //<int_val> expr
 //%left EQ
 %right APPLY
@@ -74,12 +74,14 @@ fn:
 	|symbol '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
 	|LET symbol ':' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
 	|symbol ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-	|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($4,cons($2,cons($7,new_empty_list()))));}
-	|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}
+/*	|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($4,cons($2,cons($7,new_empty_list()))));}*/
+	|LET listpicker_list '=' object {$$=cons(new_atom_s("__set_list__"),cons($2,cons($4,new_empty_list())));}
+/*	|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}*/
+	|listpicker_list '=' object {$$=cons(new_atom_s("__set_list__"),cons($1,cons($3,new_empty_list())));}
 	|LET hashpicker_list '=' object {$$=cons(new_atom_s("__set_hash__"),cons($2,cons($4,new_empty_list())));}
-	|LET symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}
+/*	|LET symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}*/
 	|hashpicker_list '=' object {$$=cons(new_atom_s("__set_hash__"),cons($1,cons($3,new_empty_list())));}
-	|symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}
+/*	|symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}*/
 	|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
 	|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
 	|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
@@ -109,9 +111,10 @@ expr:	number		{$$=$1;}
 	|'(' expr ')'	{$$=$2;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
 	| func_application {$$=$1;}
-	| symbol '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
+/*	| symbol '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}*/
 /*	| symbol '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
 	| symbol '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}*/
+	| listpicker_list {$$=$1;} 
 	| hashpicker_list {$$=$1;} 
 
 /*op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}*/
@@ -198,13 +201,19 @@ hashpicker_list_dot:
 	| func_application {$$=$1;}
 
 hashpicker_list_bracket:
-	hashpicker_list_bracket '~' hashpicker_str '~' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+	hashpicker_list_bracket '~' '['  hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($4,cons($1,new_empty_list())));}
 	| symbol {$$=$1;}
 	| func_application {$$=$1;}
 
 hashpicker_list:
 	hashpicker_list_dot {$$=$1;}
 	|hashpicker_list_bracket {$$=$1;}
+
+listpicker_list:
+	listpicker_list '['  listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
+	| symbol {$$=$1;}
+	| func_application {$$=$1;}
+	
 
 /*
 namespace:
