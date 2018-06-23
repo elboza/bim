@@ -519,18 +519,13 @@ object_t *set_list_proc(object_t *arguments){
 	return ok_symbol;
 }
 object_t *set_hash_proc(object_t *arguments){
-	object_t *index,*var,*val,*obj;
+	object_t *old_val,*new_val;
 	//printf("set hash\n");
-	index=car(arguments);
-	var=cadr(arguments);
-	val=caddr(arguments);
-	if(!is_hash(var)){
-		//printf("not a hash!!\n");
-		return bottom;
-	}
-	obj=get_hash_proc(arguments);
-	if(IS_BOTTOM(obj)){add_node_last(var,make_hash_node(index,val));return ok_symbol;}
-	if(subst_node_tree(obj,val)!=0) return bottom;
+	old_val=car(arguments);
+	new_val=cadr(arguments);
+	//reimplement add_node_last with correct vaules
+	//if(IS_BOTTOM(old_val)){add_node_last(var,make_hash_node(index,val));return ok_symbol;}
+	if(subst_node_tree(old_val,new_val)!=0) return bottom;
 	return ok_symbol;
 }
 object_t *make_primitive_proc(object_t *(*fn)(struct _object *arguments)){
