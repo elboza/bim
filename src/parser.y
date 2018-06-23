@@ -30,7 +30,7 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
 %token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list 
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single 
 //<int_val> expr
 //%left EQ
 %right APPLY
@@ -144,13 +144,25 @@ number:
 	INTEGER {$$=new_atom_i($1);}
 	|FLOAT {$$=new_atom_f($1);}
 
+/*lambda:
+	'\\' LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}*/
+
 lambda:
-	'\\' LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}
+	'\\' lambda_single {$$=$2;}
+	|'\\' LAMBDA_PARAMS {$$=$2;}
+
+lambda_single:
+	LAMBDA_PARAM '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
+
+LAMBDA_PARAM:
+	symbol {$$=cons($1,new_empty_list());}
 
 LAMBDA_PARAMS:
-	symbol {$$=cons($1,new_empty_list());}
-	|symbol ':' symbol {$$=cons($1,cons($3,new_empty_list()));}
-	|symbol ',' LAMBDA_PARAMS {$$=cons($1,$3);}
+/*	|symbol ':' symbol {$$=cons($1,cons($3,new_empty_list()));}
+	|symbol ',' LAMBDA_PARAMS {$$=cons($1,$3);}*/
+	LAMBDA_PARAMS ',' lambda_single {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));} 
+	|LAMBDA_PARAMS ',' symbol {$$=cons($1,cons(new_atom_s("__lambda__"),cons($3,new_empty_list())));}
+	|symbol {$$=$1;}
 
 LAMBDA_BODY:
 	sexpr {$$=$1;}
