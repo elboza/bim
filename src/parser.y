@@ -30,7 +30,7 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
 %token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single 
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single func_applications single_f_application multiple_f_application function_arg funcallname
 //<int_val> expr
 //%left EQ
 %right APPLY
@@ -110,7 +110,7 @@ expr:	number		{$$=$1;}
 	|expr POW expr	{$$=cons(new_atom_s("__pow__"),cons($1,cons($3,new_empty_list())));}
 	|'(' expr ')'	{$$=$2;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
-	| func_application {$$=$1;}
+	| func_applications {$$=$1;}
 /*	| symbol '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}*/
 /*	| symbol '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
 	| symbol '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}*/
@@ -148,8 +148,7 @@ number:
 	'\\' LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}*/
 
 lambda:
-	'\\' lambda_single {$$=$2;}
-	|'\\' LAMBDA_PARAMS {$$=$2;}
+	'\\' LAMBDA_PARAMS {$$=$2;}
 
 lambda_single:
 	LAMBDA_PARAM '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
@@ -160,22 +159,45 @@ LAMBDA_PARAM:
 LAMBDA_PARAMS:
 /*	|symbol ':' symbol {$$=cons($1,cons($3,new_empty_list()));}
 	|symbol ',' LAMBDA_PARAMS {$$=cons($1,$3);}*/
-	LAMBDA_PARAMS ',' lambda_single {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));} 
-	|LAMBDA_PARAMS ',' symbol {$$=cons($1,cons(new_atom_s("__lambda__"),cons($3,new_empty_list())));}
-	|symbol {$$=$1;}
+	lambda_single {$$=$1;} 
+	|LAMBDA_PARAM ',' LAMBDA_PARAMS {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
+	|LAMBDA_PARAM {$$=$1;}
 
 LAMBDA_BODY:
 	sexpr {$$=$1;}
 
+func_applications:
+/*	func_application APPLY func_applications {$$=cons(cons($1,new_empty_list()),$3);}
+	|*/func_application {$$=$1;}
+/*
+func_application:
+	single_f_application {$$=$1;}
+	|multiple_f_application {$$=$1;}
+
+single_f_application:
+	funcallname APPLY '(' function_arg ')' {$$=cons($1,$4);}
+
+funcallname:
+	symbol {$$=$1;}
+	|lambda {$$=$1;}
+
+function_arg:
+	object {$$=cons($1,new_empty_list());}
+
+multiple_f_application:
+	'~' symbol {$$=$2;}
+*/
+
 func_application: 
-	symbol '(' func_args ')' {/*$$=cons(new_atom_s("__apply__"),cons($1,$3));*/$$=cons($1,$3);}
+	symbol '(' func_args ')' {$$=cons($1,$3);}
 	| lambda APPLY '(' func_args ')' {$$=cons($1,$4);}
 	| symbol APPLY '(' func_args ')' {$$=cons($1,$4);}
 
 func_args: 
 	object {$$=cons($1,new_empty_list());}
-	|object ',' func_args {$$=cons($1,$3);}
+	|object ',' func_args {$$=cons(cons($1,new_empty_list()),$3);}
 	|{$$=new_empty_list();}
+
 
 list: 
 	'[' listitems_orempty ']' {$$=cons_dl(new_atom_s("__list__"),$2);}
