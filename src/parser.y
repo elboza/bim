@@ -29,8 +29,9 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application func_args blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single func_applications single_f_application multiple_f_application function_arg funcallname
+%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL LAMBDA_CLJ_SYM BEGIN_LISP_SYM END_LISP_SYM
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single func_applications single_f_application multiple_f_application function_arg funcallname lambda_CLJ LAMBDA_PARAMS_CLJ LISP LISP_SEXPR LISP_ITEM func_application_CLJ func_args LISP_LIST LISP_ITEM2
+// func_args
 //<int_val> expr
 //%left EQ
 %right APPLY
@@ -60,6 +61,7 @@ object:
 	|lambda {$$=$1;}
 	|list {$$=$1;}
 	|hash {$$=$1;}
+	|BEGIN_LISP_SYM LISP END_LISP_SYM {$$=$2;}
 
 sexprlist: 
 	sexpr ';' sexprlist {$$=cons($1,$3);} | sexpr {$$=cons($1,new_empty_list());}|{$$=new_empty_list();}
@@ -74,14 +76,10 @@ fn:
 	|symbol '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
 	|LET symbol ':' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
 	|symbol ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-/*	|LET symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($4,cons($2,cons($7,new_empty_list()))));}*/
 	|LET listpicker_list '=' object {$$=cons(new_atom_s("__set_list__"),cons($2,cons($4,new_empty_list())));}
-/*	|symbol '[' listpicker ']' '=' object {$$=cons(new_atom_s("__set_list__"),cons($3,cons($1,cons($6,new_empty_list()))));}*/
 	|listpicker_list '=' object {$$=cons(new_atom_s("__set_list__"),cons($1,cons($3,new_empty_list())));}
 	|LET hashpicker_list '=' object {$$=cons(new_atom_s("__set_hash__"),cons($2,cons($4,new_empty_list())));}
-/*	|LET symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($4,cons($2,cons($7,new_empty_list()))));}*/
 	|hashpicker_list '=' object {$$=cons(new_atom_s("__set_hash__"),cons($1,cons($3,new_empty_list())));}
-/*	|symbol '[' hashpicker_str ']' '=' object {$$=cons(new_atom_s("__set_hash__"),cons($3,cons($1,cons($6,new_empty_list()))));}*/
 	|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
 	|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
 	|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
@@ -110,10 +108,7 @@ expr:	number		{$$=$1;}
 	|expr POW expr	{$$=cons(new_atom_s("__pow__"),cons($1,cons($3,new_empty_list())));}
 	|'(' expr ')'	{$$=$2;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
-	| func_applications {$$=$1;}
-/*	| symbol '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}*/
-/*	| symbol '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
-	| symbol '[' hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}*/
+	| func_application {$$=$1;}
 	| listpicker_list {$$=$1;} 
 	| hashpicker_list {$$=$1;} 
 
@@ -144,11 +139,12 @@ number:
 	INTEGER {$$=new_atom_i($1);}
 	|FLOAT {$$=new_atom_f($1);}
 
-/*lambda:
-	'\\' LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}*/
-
 lambda:
-	'\\' LAMBDA_PARAMS {$$=$2;}
+	'\\' LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}
+	|lambda_CLJ {$$=$1;}
+
+lambda_CLJ:
+	LAMBDA_CLJ_SYM LAMBDA_PARAMS_CLJ {$$=$2;}
 
 lambda_single:
 	LAMBDA_PARAM '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
@@ -157,25 +153,34 @@ LAMBDA_PARAM:
 	symbol {$$=cons($1,new_empty_list());}
 
 LAMBDA_PARAMS:
+	symbol {$$=cons($1,new_empty_list());}
+	|symbol ':' symbol {$$=cons($1,cons($3,new_empty_list()));}
+	|symbol ',' LAMBDA_PARAMS {$$=cons($1,$3);}
+
+LAMBDA_PARAMS_CLJ:
 /*	|symbol ':' symbol {$$=cons($1,cons($3,new_empty_list()));}
 	|symbol ',' LAMBDA_PARAMS {$$=cons($1,$3);}*/
 	lambda_single {$$=$1;} 
-	|LAMBDA_PARAM ',' LAMBDA_PARAMS {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
+	|LAMBDA_PARAM ',' LAMBDA_PARAMS_CLJ {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
 	|LAMBDA_PARAM {$$=$1;}
 
 LAMBDA_BODY:
 	sexpr {$$=$1;}
 
 func_applications:
-/*	func_application APPLY func_applications {$$=cons(cons($1,new_empty_list()),$3);}
-	|*/func_application {$$=$1;}
-/*
-func_application:
+	func_application APPLY func_applications {$$=cons(cons($1,new_empty_list()),$3);}
+	|func_application {$$=$1;}
+
+next_applications:
+	APPLY '(' function_arg ')' 
+
+func_application_CLJ:
 	single_f_application {$$=$1;}
 	|multiple_f_application {$$=$1;}
 
 single_f_application:
-	funcallname APPLY '(' function_arg ')' {$$=cons($1,$4);}
+	symbol APPLY '(' function_arg ')' {$$=cons($1,$4);}
+	|lambda APPLY '(' function_arg ')' {$$=cons($1,$4);}
 
 funcallname:
 	symbol {$$=$1;}
@@ -186,7 +191,7 @@ function_arg:
 
 multiple_f_application:
 	'~' symbol {$$=$2;}
-*/
+
 
 func_application: 
 	symbol '(' func_args ')' {$$=cons($1,$3);}
@@ -195,7 +200,7 @@ func_application:
 
 func_args: 
 	object {$$=cons($1,new_empty_list());}
-	|object ',' func_args {$$=cons(cons($1,new_empty_list()),$3);}
+	|object ',' func_args {$$=cons($1,$3);}
 	|{$$=new_empty_list();}
 
 
@@ -256,6 +261,26 @@ listpicker_list:
 	| symbol {$$=$1;}
 	| func_application {$$=$1;}
 	
+LISP:
+	LISP_SEXPR {$$=$1;}
+
+LISP_SEXPR:
+	LISP_ITEM {$$=$1;}
+	|LISP_LIST {$$=$1;}
+
+LISP_LIST:
+	'(' LISP_SEXPR LISP_ITEM2 ')' {$$=cons($2,$3);}
+
+LISP_ITEM2:
+	LISP_SEXPR LISP_ITEM2 {$$=cons($1,$2);}
+	|LISP_SEXPR {$$=$1;}
+
+LISP_ITEM:
+	symbol {$$=$1;}
+	|number {$$=$1;}
+	|string {$$=$1;}
+/*	|LISP_SEXPR 
+*/
 
 /*
 namespace:

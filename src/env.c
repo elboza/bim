@@ -440,6 +440,14 @@ object_t *count_proc(object_t *arguments){
 	if(n==-1) return new_atom_bottom();
 	return new_atom_i(n);
 }
+object_t *inspect_proc(object_t *arguments){
+	printf("\n----------------\n");
+	print_ast(arguments);
+	printf("\n----------------\n");
+	print_debug_ast(arguments);
+	printf("\n----------------\n");
+	return ok_symbol;
+}
 object_t *get_string_at(object_t *arguments){
 	object_t *x=cadr(arguments);
 	object_t *index=car(arguments);
@@ -713,6 +721,7 @@ void populate_environment(object_t *env) {
 	add_procedure("__gt__",is_greater_than_proc);
 	add_procedure("__le__",is_less_and_eq_than_proc);
 	add_procedure("__ge__",is_greater_and_eq_than_proc);
+	add_procedure("inspect",inspect_proc);
 
 	/*#define FUNCTION_SYMBOL(name, func_ptr) \
 		(cons(new_atom_s((name)), cons(new_fn((func_ptr)), NULL)))

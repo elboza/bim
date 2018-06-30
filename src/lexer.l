@@ -16,7 +16,8 @@ digit [0-9]
 bindigit [0-1]
 letter [a-zA-Z_]
 hexletter [a-fA-F]
-comment \/\/
+comment2 \/\/
+comment #
 identifier {letter}({letter}|{digit})*
 qstring \"[^"\n]*["\n]
 qstring2 \'[^'\n]*['\n]
@@ -69,6 +70,9 @@ newline \n
 "%%"		return REMINDER;
 "->"		return APPLY;
 "$!"		return LAST_EVAL_VAL;
+"~\\"		return LAMBDA_CLJ_SYM;
+"(%"		return BEGIN_LISP_SYM;
+"%)"		return END_LISP_SYM;
 
 
 [-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£^] {

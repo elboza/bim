@@ -54,6 +54,7 @@ object_t *get_string_slice(int a,int b,object_t *x);
 int count_list(object_t *list);
 int count_str(object_t *x);
 object_t *count_proc(object_t *arguments);
+object_t *inspect_proc(object_t *arguments);
 object_t *get_string_at(object_t *arguments);
 object_t *get_list_proc(object_t *arguments);
 object_t *get_hash_proc(object_t *arguments);
