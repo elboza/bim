@@ -88,15 +88,16 @@ void execute(char *s)
 	yy_scan_string(s);
 	int x=yyparse(&ast);
 	yylex_destroy();
-	// if(false){
-	// 		printf("\n----------------\n");
-	// 		print_ast(ast);
-	// 		printf("\n----------------\n");
-	// 		print_debug_ast(ast);
-	// 		printf("\n----------------\n");
-	// 		//print_atom(ast);
-	// 		//printf("debug: %d\n",is_debug_var());
-	// 	}
+	if(!true){
+			printf("\n----------------\n");
+			print_ast(ast);
+			printf("\n----------------\n");
+			print_debug_ast(ast);
+			printf("\n----------------\n");
+			//print_atom(ast);
+			//printf("debug: %d\n",is_debug_var());
+			//x=1;
+		}
 	log_d("+");
 	if(x==0 && ast!=NULL){
 		print_obj(run(ast,the_global_environment));

@@ -29,8 +29,8 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL LAMBDA_CLJ_SYM BEGIN_LISP_SYM END_LISP_SYM
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single lambda_CLJ LAMBDA_PARAMS_CLJ LISP LISP_SEXPR LISP_ITEM LISP_LIST func_args
+%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL LAMBDA_PROC_SYM BEGIN_LISP_SYM END_LISP_SYM BIND_SYM MAPPL_SYM
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single lambda_CLJ LAMBDA_PARAMS_CLJ LISP LISP_SEXPR LISP_ITEM LISP_LIST func_args BIND_APPL
 //%type func_applications single_f_application multiple_f_application function_arg funcallname func_application_CLJ 
 // func_args
 //<int_val> expr
@@ -110,8 +110,9 @@ expr:	number		{$$=$1;}
 	|'(' expr ')'	{$$=$2;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
 	| func_application {$$=$1;}
-	| listpicker_list {$$=$1;} 
-	| hashpicker_list {$$=$1;} 
+//	| listpicker_list {$$=$1;} 
+//	| hashpicker_list {$$=$1;} 
+	| MAPPL_SYM BIND_APPL {$$=$2;}
 
 /*op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}*/
 
@@ -141,11 +142,11 @@ number:
 	|FLOAT {$$=new_atom_f($1);}
 
 lambda:
-	'\\' LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}
+	LAMBDA_PROC_SYM LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}
 	|lambda_CLJ {$$=$1;}
 
 lambda_CLJ:
-	LAMBDA_CLJ_SYM LAMBDA_PARAMS_CLJ {$$=$2;}
+	'\\' LAMBDA_PARAMS_CLJ {$$=$2;}
 
 lambda_single:
 	LAMBDA_PARAM '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
@@ -262,6 +263,15 @@ listpicker_list:
 	| symbol {$$=$1;}
 	| func_application {$$=$1;}
 	
+BIND_APPL:
+	object {$$=$1;}
+	| BIND_APPL APPLY '(' object ')' {$$=cons($1,cons($4,new_empty_list()));}
+	| BIND_APPL '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
+	| BIND_APPL '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
+	| BIND_APPL BIND_SYM symbol {$$=cons($3,cons($1,new_empty_list()));}
+	| BIND_APPL BIND_SYM lambda {$$=cons($3,cons($1,new_empty_list()));}
+	| BIND_APPL ',' object {$$=cons($1,cons($3,new_empty_list()));}
+
 LISP:
 	{$$=new_empty_list();}
 	| LISP_SEXPR LISP {$$=cons($1,$2);}

@@ -70,9 +70,11 @@ newline \n
 "%%"		return REMINDER;
 "->"		return APPLY;
 "$!"		return LAST_EVAL_VAL;
-"~\\"		return LAMBDA_CLJ_SYM;
+"~\\"		return LAMBDA_PROC_SYM;
 "(%"		return BEGIN_LISP_SYM;
 "%)"		return END_LISP_SYM;
+".."		return BIND_SYM;
+"!!"		return MAPPL_SYM;
 
 
 [-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£^] {
