@@ -30,7 +30,8 @@ void yyerror(struct _object **ast,char *s);
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
 %token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL LAMBDA_CLJ_SYM BEGIN_LISP_SYM END_LISP_SYM
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single func_applications single_f_application multiple_f_application function_arg funcallname lambda_CLJ LAMBDA_PARAMS_CLJ LISP LISP_SEXPR LISP_ITEM func_application_CLJ func_args LISP_LIST LISP_ITEM2
+%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single lambda_CLJ LAMBDA_PARAMS_CLJ LISP LISP_SEXPR LISP_ITEM LISP_LIST func_args
+//%type func_applications single_f_application multiple_f_application function_arg funcallname func_application_CLJ 
 // func_args
 //<int_val> expr
 //%left EQ
@@ -61,7 +62,7 @@ object:
 	|lambda {$$=$1;}
 	|list {$$=$1;}
 	|hash {$$=$1;}
-	|BEGIN_LISP_SYM LISP END_LISP_SYM {$$=$2;}
+	|BEGIN_LISP_SYM LISP END_LISP_SYM {$$=cons(new_atom_s("__progn__"),$2);}
 
 sexprlist: 
 	sexpr ';' sexprlist {$$=cons($1,$3);} | sexpr {$$=cons($1,new_empty_list());}|{$$=new_empty_list();}
@@ -166,7 +167,7 @@ LAMBDA_PARAMS_CLJ:
 
 LAMBDA_BODY:
 	sexpr {$$=$1;}
-
+/*
 func_applications:
 	func_application APPLY func_applications {$$=cons(cons($1,new_empty_list()),$3);}
 	|func_application {$$=$1;}
@@ -191,7 +192,7 @@ function_arg:
 
 multiple_f_application:
 	'~' symbol {$$=$2;}
-
+*/
 
 func_application: 
 	symbol '(' func_args ')' {$$=cons($1,$3);}
@@ -262,18 +263,17 @@ listpicker_list:
 	| func_application {$$=$1;}
 	
 LISP:
-	LISP_SEXPR {$$=$1;}
+	{$$=new_empty_list();}
+	| LISP_SEXPR LISP {$$=cons($1,$2);}
+	
 
 LISP_SEXPR:
 	LISP_ITEM {$$=$1;}
 	|LISP_LIST {$$=$1;}
 
-LISP_LIST:
-	'(' LISP_SEXPR LISP_ITEM2 ')' {$$=cons($2,$3);}
 
-LISP_ITEM2:
-	LISP_SEXPR LISP_ITEM2 {$$=cons($1,$2);}
-	|LISP_SEXPR {$$=$1;}
+LISP_LIST:
+	'(' LISP ')' {$$=$2;}
 
 LISP_ITEM:
 	symbol {$$=$1;}
