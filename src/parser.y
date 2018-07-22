@@ -31,11 +31,8 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT IF WHILE LET PRN TT NIL TYPE ELSE POW AND OR EQ NEQ LE GE rot_l rot_r shift_l shift_r b_xor REMINDER APPLY LAST_EVAL_VAL LAMBDA_PROC_SYM BEGIN_LISP_SYM END_LISP_SYM BIND_SYM MAPPL_SYM
-%type <obj> number object sexpr fn sexprlist symbol expr boolean string func_application blockcode LAMBDA_BODY LAMBDA_PARAMS LAMBDA_PARAM lambda list listitems listitems_orempty hash hashitems hashitems_orempty hashitem listpicker hashpicker bexpr printlist MAYBEELSE hashpicker_str hashpicker_list hashpicker_list_dot hashpicker_list_bracket listpicker_list lambda_single lambda_CLJ LAMBDA_PARAMS_CLJ LISP LISP_SEXPR LISP_ITEM LISP_LIST func_args BIND_APPL
-//%type func_applications single_f_application multiple_f_application function_arg funcallname func_application_CLJ 
-// func_args
-//<int_val> expr
+%token QUIT PRN TT NIL BEGIN_LISP_SYM END_LISP_SYM LAST_EVAL_VAL IF WHILE ELSE TYPE LET FUNC APPLY BIND_SYM MAPPL_SYM
+%type <obj> object bim_expr_list bim_expr expr bexpr LISP LISP_SEXPR LISP_LIST LISP_ITEM number string fn symbol boolean blockcode MAYBEELSE comma_list func_application functions LAMBDA_BODY LAMBDA_PARAM LAMBDA_PARAMS_CLJ lambda_CLJ lambda_single BIND_APPL
 //%left EQ
 %right APPLY
 %nonassoc THEN
@@ -48,49 +45,43 @@ void yyerror(struct _object **ast,char *s);
 %left '&' '|' rot_l rot_r shift_l shift_r b_xor
 %right POW
 %precedence NEG
-//%right '='
+//%left ','
 
 %start bim
 %parse-param{struct _object **ast}
 %%
 
 bim:
-	sexprlist {*ast=$1;YYACCEPT;}
+	bim_expr_list {*ast=$1;YYACCEPT;}
 
 object:	
 	bexpr {$$=$1;}
 	|expr {$$=$1;}
 	|string {$$=$1;}
-	|lambda {$$=$1;}
-	|list {$$=$1;}
-	|hash {$$=$1;}
+	|functions {$$=$1;}
 	|BEGIN_LISP_SYM LISP END_LISP_SYM {$$=cons(new_atom_s("__progn__"),$2);}
 
-sexprlist: 
-	sexpr ';' sexprlist {$$=cons($1,$3);} | sexpr {$$=cons($1,new_empty_list());}|{$$=new_empty_list();}
+bim_expr_list: 
+	bim_expr ';' bim_expr_list {$$=cons($1,$3);} 
+	| bim_expr {$$=cons($1,new_empty_list());}
+	/*| {$$=new_empty_list();}*/
 
-sexpr: 
+bim_expr: 
 	fn {$$=$1;} 
 	| object {$$=$1;}
 
 fn: 	
 	QUIT	{quit_shell=1;$$=NULL;YYACCEPT;}
-	|LET symbol '=' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
 	|symbol '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-	|LET symbol ':' object	{$$=cons(new_atom_s("__assign__"),cons($2,cons($4,new_empty_list())));}
 	|symbol ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-	|LET listpicker_list '=' object {$$=cons(new_atom_s("__set_list__"),cons($2,cons($4,new_empty_list())));}
-	|listpicker_list '=' object {$$=cons(new_atom_s("__set_list__"),cons($1,cons($3,new_empty_list())));}
-	|LET hashpicker_list '=' object {$$=cons(new_atom_s("__set_hash__"),cons($2,cons($4,new_empty_list())));}
-	|hashpicker_list '=' object {$$=cons(new_atom_s("__set_hash__"),cons($1,cons($3,new_empty_list())));}
-	|PRN printlist			{$$=cons(new_atom_s("__prn__"),$2);}
-	|TYPE sexpr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
-	|IF '(' bexpr ')' sexpr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
-	|WHILE '(' bexpr ')' sexpr {$$=cons(new_atom_s("__while__"),cons($3,cons($5,new_empty_list())));}
+	|PRN comma_list			{$$=cons(new_atom_s("__prn__"),$2);}
+	|TYPE bim_expr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
+	|IF '(' bexpr ')' bim_expr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
+	|WHILE '(' bexpr ')' bim_expr {$$=cons(new_atom_s("__while__"),cons($3,cons($5,new_empty_list())));}
 	|blockcode {$$=$1;}
 
 blockcode: 
-	'{' sexprlist '}' {$$=cons(new_atom_s("__progn__"),$2);}
+	'{' bim_expr_list '}' {$$=cons(new_atom_s("__progn__"),$2);}
 
 expr:	number		{$$=$1;}
 	| symbol {$$=$1;}
@@ -112,9 +103,7 @@ expr:	number		{$$=$1;}
 	|'(' expr ')'	{$$=$2;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
 	| func_application {$$=$1;}
-//	| listpicker_list {$$=$1;} 
-//	| hashpicker_list {$$=$1;} 
-	| MAPPL_SYM BIND_APPL {$$=$2;}
+
 
 /*op: '+' {$$=new_atom_s("add");}|'-' {$$=new_atom_s("sub");}|'*' {$$=new_atom_s("mul");}|'/' {$$=new_atom_s("div");}*/
 
@@ -134,17 +123,27 @@ bexpr:
 	|bexpr NEQ bexpr {$$=cons(new_atom_s("__neq__"),cons($1,cons($3,new_empty_list())));}
 	|'!' bexpr  %prec NOT {$$=cons(new_atom_s("__not__"),cons($2,new_empty_list()));}
 
+func_application: 
+	symbol '(' comma_list ')' {$$=cons($1,$3);}
+	| MAPPL_SYM BIND_APPL {$$=$2;}
+
+BIND_APPL:
+	object {$$=$1;}
+	| BIND_APPL APPLY '(' object ')' {$$=cons($1,cons($4,new_empty_list()));}
+	| BIND_APPL BIND_SYM symbol {$$=cons($3,cons($1,new_empty_list()));}
+	| BIND_APPL BIND_SYM functions {$$=cons($3,cons($1,new_empty_list()));}
+	| BIND_APPL ',' object {$$=cons($1,cons($3,new_empty_list()));}
+
 MAYBEELSE: 
-	ELSE sexpr %prec ELSE{$$=$2;}
-	/*|';' ELSE sexpr %prec ELSE{$$=$3;}*/
+	ELSE bim_expr %prec ELSE{$$=$2;}
 	| %prec THEN{$$=new_empty_list();}
 
 number:	
 	INTEGER {$$=new_atom_i($1);}
 	|FLOAT {$$=new_atom_f($1);}
 
-lambda:
-	LAMBDA_PROC_SYM LAMBDA_PARAMS '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}
+functions:
+	FUNC '(' comma_list ')' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($3,cons($5,new_empty_list())));}
 	|lambda_CLJ {$$=$1;}
 
 lambda_CLJ:
@@ -156,123 +155,13 @@ lambda_single:
 LAMBDA_PARAM:
 	symbol {$$=cons($1,new_empty_list());}
 
-LAMBDA_PARAMS:
-	symbol {$$=cons($1,new_empty_list());}
-	|symbol ':' symbol {$$=cons($1,cons($3,new_empty_list()));}
-	|symbol ',' LAMBDA_PARAMS {$$=cons($1,$3);}
-
 LAMBDA_PARAMS_CLJ:
-/*	|symbol ':' symbol {$$=cons($1,cons($3,new_empty_list()));}
-	|symbol ',' LAMBDA_PARAMS {$$=cons($1,$3);}*/
 	lambda_single {$$=$1;} 
 	|LAMBDA_PARAM ',' LAMBDA_PARAMS_CLJ {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}
 	|LAMBDA_PARAM {$$=$1;}
 
 LAMBDA_BODY:
-	sexpr {$$=$1;}
-/*
-func_applications:
-	func_application APPLY func_applications {$$=cons(cons($1,new_empty_list()),$3);}
-	|func_application {$$=$1;}
-
-next_applications:
-	APPLY '(' function_arg ')' 
-
-func_application_CLJ:
-	single_f_application {$$=$1;}
-	|multiple_f_application {$$=$1;}
-
-single_f_application:
-	symbol APPLY '(' function_arg ')' {$$=cons($1,$4);}
-	|lambda APPLY '(' function_arg ')' {$$=cons($1,$4);}
-
-funcallname:
-	symbol {$$=$1;}
-	|lambda {$$=$1;}
-
-function_arg:
-	object {$$=cons($1,new_empty_list());}
-
-multiple_f_application:
-	'~' symbol {$$=$2;}
-*/
-
-func_application: 
-	symbol '(' func_args ')' {$$=cons($1,$3);}
-	| lambda APPLY '(' func_args ')' {$$=cons($1,$4);}
-	| symbol APPLY '(' func_args ')' {$$=cons($1,$4);}
-
-func_args: 
-	object {$$=cons($1,new_empty_list());}
-	|object ',' func_args {$$=cons($1,$3);}
-	|{$$=new_empty_list();}
-
-
-list: 
-	'[' listitems_orempty ']' {$$=cons_dl(new_atom_s("__list__"),$2);}
-
-listitems: 
-	object {$$=cons_dl($1,new_empty_list());}
-	| object ',' listitems {$$=cons_dl($1,$3);}
-
-listitems_orempty:
-	/*empty*/ {$$=new_empty_list();}
-	|listitems {$$=$1;}
-
-hash: 
-	'{' hashitems_orempty '}' {$$=cons_dl(new_atom_s("__hash__"),$2);}
-
-hashitem: 
-	string ':' object {$$=cons_dl($1,cons_dl($3,new_empty_list()));}
-	| WORD ':' object {$$=cons_dl(new_atom_str_Q($1),cons_dl($3,new_empty_list()));}
-
-hashitems: 
-	hashitem {$$=cons_dl($1,new_empty_list());}
-	|hashitem ',' hashitems {$$=cons_dl($1,$3);}
-
-hashitems_orempty:
-	/*empty*/ {$$=new_empty_list();}
-	|hashitems {$$=$1;}
-
-listpicker:
-	expr {$$=$1;}
-	|expr ':' expr {$$=cons(new_atom_s("__list_range__"),cons($1,cons($3,new_empty_list())));}
-	| ':' expr {$$=cons(new_atom_s("__list_range__"),cons(new_atom_i(0),cons($2,new_empty_list())));}
-	| expr ':' {$$=cons(new_atom_s("__list_range__"),cons($1,cons(new_atom_i(-1),new_empty_list())));}
-
-hashpicker:
-	WORD {$$=new_atom_str_Q($1);}
-
-hashpicker_str:
-	string {$$=$1;}
-
-hashpicker_list_dot:
-	hashpicker_list_dot '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
-	| symbol {$$=$1;}
-	| func_application {$$=$1;}
-
-hashpicker_list_bracket:
-	hashpicker_list_bracket '~' '['  hashpicker_str ']' {$$=cons(new_atom_s("__get_hash__"),cons($4,cons($1,new_empty_list())));}
-	| symbol {$$=$1;}
-	| func_application {$$=$1;}
-
-hashpicker_list:
-	hashpicker_list_dot {$$=$1;}
-	|hashpicker_list_bracket {$$=$1;}
-
-listpicker_list:
-	listpicker_list '['  listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
-	| symbol {$$=$1;}
-	| func_application {$$=$1;}
-	
-BIND_APPL:
-	object {$$=$1;}
-	| BIND_APPL APPLY '(' object ')' {$$=cons($1,cons($4,new_empty_list()));}
-	| BIND_APPL '.' hashpicker {$$=cons(new_atom_s("__get_hash__"),cons($3,cons($1,new_empty_list())));}
-	| BIND_APPL '[' listpicker ']' {$$=cons(new_atom_s("__get_list__"),cons($3,cons($1,new_empty_list())));}
-	| BIND_APPL BIND_SYM symbol {$$=cons($3,cons($1,new_empty_list()));}
-	| BIND_APPL BIND_SYM lambda {$$=cons($3,cons($1,new_empty_list()));}
-	| BIND_APPL ',' object {$$=cons($1,cons($3,new_empty_list()));}
+	bim_expr {$$=$1;}
 
 LISP:
 	{$$=new_empty_list();}
@@ -283,7 +172,6 @@ LISP_SEXPR:
 	LISP_ITEM {$$=$1;}
 	|LISP_LIST {$$=$1;}
 
-
 LISP_LIST:
 	'(' LISP ')' {$$=$2;}
 
@@ -291,8 +179,6 @@ LISP_ITEM:
 	symbol {$$=$1;}
 	|number {$$=$1;}
 	|string {$$=$1;}
-/*	|LISP_SEXPR 
-*/
 
 /*
 namespace:
@@ -301,10 +187,9 @@ namespace:
 	| namespace NAMESPACE symbol {$$=cons(new_atom_s("__namespace__"),cons($1,cons($3,new_empty_list())));}
 */								 
 
-printlist: 
-	sexpr {$$=cons($1,new_empty_list());}
-	| sexpr ',' printlist {$$=cons($1,$3);}
-
+comma_list: 
+	bim_expr {$$=cons($1,new_empty_list());}
+	| bim_expr ',' comma_list {$$=cons($1,$3);}
 
 symbol: 
 	WORD {$$=new_atom_s($1);}
@@ -313,7 +198,6 @@ symbol:
 
 string: 
 	STRING {$$=new_atom_str_QQ($1);}
-	|STRING2 {$$=new_atom_str_Q($1);}
 
 boolean:	
 	TT {$$=new_atom_b(1);}

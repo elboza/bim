@@ -53,15 +53,15 @@ newline \n
 			}
 
 "let"		return LET;
-"exit"		return QUIT;
+"func"	return FUNC;
 "quit"		return QUIT;
 "prn"		return PRN;
-"#t"		return TT;
-"#f"		return NIL;
-":t"		return TYPE;
 "if"		return IF;
 "while"		return WHILE;
 "else"		return ELSE;
+"#t"		return TT;
+"#f"		return NIL;
+":t"		return TYPE;
 "^^"		return POW;
 "&&"		return AND;
 "||"		return OR;
@@ -75,11 +75,10 @@ newline \n
 "<<<"		return rot_l;
 ">>>"		return rot_r;
 "%%"		return REMINDER;
-"->"		return APPLY;
 "$!"		return LAST_EVAL_VAL;
-"~\\"		return LAMBDA_PROC_SYM;
 "(%"		return BEGIN_LISP_SYM;
 "%)"		return END_LISP_SYM;
+"->"		return APPLY;
 ".."		return BIND_SYM;
 "!!"		return MAPPL_SYM;
 
@@ -103,14 +102,6 @@ newline \n
 				else 
 				yylval.s_val[yyleng-2] = 0;
 				return STRING;
-			}
-{qstring2}	{ 
-				yylval.s_val = strdup(yytext+1); 
-				if (yylval.s_val[yyleng-2] != 0x27) 
-				;//die("improperly terminated string"); 
-				else 
-				yylval.s_val[yyleng-2] = 0;
-				return STRING2;
 			}
 {line_comment}	{
 			BEGIN(xSINGLE_LINE_COMMENT) ;
