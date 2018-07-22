@@ -26,6 +26,8 @@ void yyerror(struct _object **ast,char *s);
 	struct _object *obj;
 };
 
+/*%glr-parser*/
+
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
@@ -48,11 +50,11 @@ void yyerror(struct _object **ast,char *s);
 %precedence NEG
 //%right '='
 
-%start lisp
+%start bim
 %parse-param{struct _object **ast}
 %%
 
-lisp:
+bim:
 	sexprlist {*ast=$1;YYACCEPT;}
 
 object:	

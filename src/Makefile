@@ -10,6 +10,7 @@ OBJECTS= main.o repl.o ast.o env.o eval.o print.o
 GRAM= lex.yy.c parser.tab.c
 RMGRAM= $(GRAM) parser.tab.h parser.output
 TARGET=bim
+LIBFLEX=
 
 all: $(TARGET)
 

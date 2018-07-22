@@ -12,17 +12,24 @@ int yywrap(void);
 unsigned int lang_mx;
 %}
 
+/*%option noyywrap*/
+
 digit [0-9]
 bindigit [0-1]
 letter [a-zA-Z_]
 hexletter [a-fA-F]
-comment2 \/\/
-comment #
+line_comment "//"
+block_comment "/*"
+shebang ^"#!"
 identifier {letter}({letter}|{digit})*
 qstring \"[^"\n]*["\n]
 qstring2 \'[^'\n]*['\n]
 ws [ \t\r]+
 newline \n
+
+%x xBLOCK_COMMENT
+%x xSHEBANG
+%x xSINGLE_LINE_COMMENT
 
 %%
 
@@ -77,7 +84,7 @@ newline \n
 "!!"		return MAPPL_SYM;
 
 
-[-()<>%+@*/;,{}.$!"\[\]:\\='?~|&£^] {
+[-()<>%+@*/#;,{}.$!"\[\]:\\='?~|&£^] {
 				return *yytext;
 			}
 
@@ -105,14 +112,25 @@ newline \n
 				yylval.s_val[yyleng-2] = 0;
 				return STRING2;
 			}
-{comment}	{
-			//printf("comment:");
-			register int c;
-			while((c=input())!='\n')
-			{if(c==EOF) {/*printf("EOF!\n");*/yyterminate();}}
-			//printf("::%x\n",ungetc(' ',yyin));
-			yylineno++;
+{line_comment}	{
+			BEGIN(xSINGLE_LINE_COMMENT) ;
 		}
+<xSINGLE_LINE_COMMENT,xSHEBANG>[^\r\n]* {
+	BEGIN(INITIAL) ;
+}
+{block_comment} {
+	BEGIN(xBLOCK_COMMENT) ;
+}
+<xBLOCK_COMMENT>. ;
+<xBLOCK_COMMENT>newline {
+	++yylineno;
+}
+<xBLOCK_COMMENT>"*/" {
+	BEGIN(INITIAL) ;
+}
+{shebang} {
+	if(yylineno==1) BEGIN(xSHEBANG);
+}
 <<EOF>>		yyterminate();
 {ws}		;	/* ignore whitespace */
 {newline}	yylineno++;
