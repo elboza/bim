@@ -31,8 +31,10 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT PRN TT NIL BEGIN_LISP_SYM END_LISP_SYM LAST_EVAL_VAL IF WHILE ELSE TYPE LET FUNC APPLY BIND_SYM MAPPL_SYM
-%type <obj> object bim_expr_list bim_expr expr bexpr LISP LISP_SEXPR LISP_LIST LISP_ITEM number string fn symbol boolean blockcode MAYBEELSE comma_list func_application functions LAMBDA_BODY LAMBDA_PARAM LAMBDA_PARAMS_CLJ lambda_CLJ lambda_single BIND_APPL
+%token QUIT PRN TT NIL BEGIN_LISP_SYM END_LISP_SYM LAST_EVAL_VAL IF WHILE ELSE TYPE LET FUNC APPLY BIND_SYM MAPPL_SYM NAMESPACE_SYM
+%type <obj> object bim_expr_list bim_expr expr bexpr LISP LISP_SEXPR LISP_LIST LISP_ITEM number string fn symbol boolean blockcode MAYBEELSE comma_list func_application functions LAMBDA_BODY LAMBDA_PARAM LAMBDA_PARAMS_CLJ lambda_CLJ lambda_single math_expr
+//%type <obj> BIND_APPL
+%type <obj> namespace
 //%left EQ
 %right APPLY
 %nonassoc THEN
@@ -72,8 +74,8 @@ bim_expr:
 
 fn: 	
 	QUIT	{quit_shell=1;$$=NULL;YYACCEPT;}
-	|symbol '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
-	|symbol ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
+	|namespace '=' object {$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
+	|namespace ':' object		{$$=cons(new_atom_s("__assign__"),cons($1,cons($3,new_empty_list())));}
 	|PRN comma_list			{$$=cons(new_atom_s("__prn__"),$2);}
 	|TYPE bim_expr				{$$=cons(new_atom_s("__type__"),cons($2,new_empty_list()));}
 	|IF '(' bexpr ')' bim_expr MAYBEELSE {$$=cons(new_atom_s("__if__"),cons($3,cons($5,cons($6,new_empty_list()))));}
@@ -83,8 +85,8 @@ fn:
 blockcode: 
 	'{' bim_expr_list '}' {$$=cons(new_atom_s("__progn__"),$2);}
 
-expr:	number		{$$=$1;}
-	| symbol {$$=$1;}
+math_expr: number		{$$=$1;}
+	| namespace {$$=$1;}
 	/*|expr op expr	{$$=cons($2,cons($1,cons($3,new_empty_list())));}*/
 	|expr '+' expr	{$$=cons(new_atom_s("__add__"),cons($1,cons($3,new_empty_list())));}
 	|expr '-' expr	{$$=cons(new_atom_s("__sub__"),cons($1,cons($3,new_empty_list())));}
@@ -102,6 +104,8 @@ expr:	number		{$$=$1;}
 	|expr POW expr	{$$=cons(new_atom_s("__pow__"),cons($1,cons($3,new_empty_list())));}
 	|'(' expr ')'	{$$=$2;}
 	| '-' expr	%prec NEG	{$$=cons(new_atom_s("__neg__"),cons($2,new_empty_list()));}
+
+expr: math_expr {$$=$1;}
 	| func_application {$$=$1;}
 
 
@@ -124,8 +128,8 @@ bexpr:
 	|'!' bexpr  %prec NOT {$$=cons(new_atom_s("__not__"),cons($2,new_empty_list()));}
 
 func_application: 
-	symbol '(' comma_list ')' {$$=cons($1,$3);}
-	| MAPPL_SYM BIND_APPL {$$=$2;}
+	namespace '(' comma_list ')' {$$=cons($1,$3);}
+/*	| MAPPL_SYM BIND_APPL {$$=$2;}
 
 BIND_APPL:
 	object {$$=$1;}
@@ -133,7 +137,7 @@ BIND_APPL:
 	| BIND_APPL BIND_SYM symbol {$$=cons($3,cons($1,new_empty_list()));}
 	| BIND_APPL BIND_SYM functions {$$=cons($3,cons($1,new_empty_list()));}
 	| BIND_APPL ',' object {$$=cons($1,cons($3,new_empty_list()));}
-
+*/
 MAYBEELSE: 
 	ELSE bim_expr %prec ELSE{$$=$2;}
 	| %prec THEN{$$=new_empty_list();}
@@ -176,16 +180,13 @@ LISP_LIST:
 	'(' LISP ')' {$$=$2;}
 
 LISP_ITEM:
-	symbol {$$=$1;}
+	namespace {$$=$1;}
 	|number {$$=$1;}
 	|string {$$=$1;}
 
-/*
 namespace:
-	/*empty*./
-	| symbol {$$=$1;}
-	| namespace NAMESPACE symbol {$$=cons(new_atom_s("__namespace__"),cons($1,cons($3,new_empty_list())));}
-*/								 
+	symbol {$$=$1;}
+	| namespace NAMESPACE_SYM symbol {$$=cons(new_atom_s("__namespace__"),cons($1,cons($3,new_empty_list())));}								 
 
 comma_list: 
 	bim_expr {$$=cons($1,new_empty_list());}

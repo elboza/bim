@@ -81,6 +81,7 @@ newline \n
 "->"		return APPLY;
 ".."		return BIND_SYM;
 "!!"		return MAPPL_SYM;
+"::"		return NAMESPACE_SYM;
 
 
 [-()<>%+@*/#;,{}.$!"\[\]:\\='?~|&£^] {
