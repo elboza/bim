@@ -1,6 +1,8 @@
 
 ChangeLog:
 
+0.3.2:
+   clojures. post operators.
 0.3.1:
    fixed $! special var on function and assignment bug.
 0.3.0:
