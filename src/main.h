@@ -11,7 +11,7 @@
 #define MAX_CMD_LEN 4096
 #define LOG_DEBUG 0
 #define HAVE_LIBREADLINE 1
-#define VERSION "0.3.1-dev"
+#define VERSION "0.3.2"
 
 void log_d(char *s);
 
