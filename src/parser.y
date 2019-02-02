@@ -31,7 +31,7 @@ void yyerror(struct _object **ast,char *s);
 %token <int_val> INTEGER
 %token <float_val> FLOAT
 %token <s_val> WORD STRING STRING2
-%token QUIT PRN TT NIL BEGIN_LISP_SYM END_LISP_SYM LAST_EVAL_VAL IF WHILE ELSE TYPE LET FUNC APPLY BIND_SYM MAPPL_SYM NAMESPACE_SYM
+%token QUIT PRN TT NIL BEGIN_LISP_SYM END_LISP_SYM LAST_EVAL_VAL IF WHILE ELSE TYPE LET FUNC APPLY BIND_SYM MAPPL_SYM NAMESPACE_SYM 
 %type <obj> object bim_expr_list bim_expr expr bexpr LISP LISP_SEXPR LISP_LIST LISP_ITEM number string fn symbol boolean blockcode MAYBEELSE comma_list func_application functions LAMBDA_BODY LAMBDA_PARAM LAMBDA_PARAMS_CLJ lambda_CLJ lambda_single math_expr 
 %type <obj> BIND_APPL
 %type <obj> list listitems_orempty listitems list_sel_item listpicker
@@ -159,11 +159,11 @@ number:
 	|FLOAT {$$=new_atom_f($1);}
 
 functions:
-	FUNC '(' comma_list ')' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($3,cons($5,new_empty_list())));}
+	'\\' comma_list '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($2,cons($4,new_empty_list())));}
 	|lambda_CLJ {$$=$1;}
 
 lambda_CLJ:
-	'\\' LAMBDA_PARAMS_CLJ {$$=$2;}
+	'~' '\\' LAMBDA_PARAMS_CLJ {$$=$3;}
 
 lambda_single:
 	LAMBDA_PARAM '.' LAMBDA_BODY {$$=cons(new_atom_s("__lambda__"),cons($1,cons($3,new_empty_list())));}

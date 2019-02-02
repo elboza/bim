@@ -54,25 +54,25 @@ read the [bim man page](doc/xbim.man.html)
 #### variables assigning and accessing
 
 ```
-a="foo"             #a = string 'foo'
-a[1]                # 'o'
-a=2+2               # 4
-a='foo'             # 'foo'
-a[0]                # 'f'
-a=0xfe              #254
-a=[1,2,3,4,5,6]     #a is a list
-count(a)            # 6 (number of elements)
-a[3]                # 4
-a[-1]               # 6
-a[2:5]              # [3,4,5,6]
-a[:3]               # [1,2,3,4]
-a[3:]               # [4,5,6]
-a={'foo':2,'bar':3} # a is a hash
-a={foo:2,bar:3}     # a is a hash (keys without string quotes)
-count(a)            # 2 (number of elements)
-a~['foo']           # 2
-a.foo               # 2
-^a=4				# assign global var a (^ refers to global vars ... see functions section).
+a="foo"                 #a = string 'foo'
+!!a[1]                  # 'o'
+a=2+2                   # 4
+a='foo'                 # 'foo'
+!!a[0]                  # 'f'
+a=0xfe                  #254
+let a=[1,2,3,4,5,6]     #a is a list
+count(a)                # 6 (number of elements)
+!!a[3]                  # 4
+!!a[-1]                 # 6
+!!a[2:5]                # [3,4,5,6]
+!!a[:3]                 # [1,2,3,4]
+!!a[3:]                 # [4,5,6]
+let a={'foo':2,'bar':3} # a is a hash
+let a={foo:2,bar:3}     # a is a hash (keys without string quotes)
+count(a)                # 2 (number of elements)
+!!a~['foo']             # 2
+!!a.foo                 # 2
+^a=4				            # assign global var a (^ refers to global vars ... see functions section).
 
 ```
 #### arithmetic and boolean opertions
@@ -150,6 +150,24 @@ y=5;\x.{y=1;x+y+^y}->(2) #8
 f:\x.{if(x==1) 1 else x*f(x-1)} #fibonacci func
 f(5)                     # 120
 
+```
+#### clojures
+```
+let f=~\x,y.x+y  # define f as a clojure function
+let g=f(2)       # g is a function partial application of f
+g(3)             # output 5
+!!f,2,3          # apply 2 and 3 to f
+!!2..f,3         # chain 2 with f(3) ... result 5
+```
+` !! ` is a post operator executor symbol. post operators are: ` .. [] . , `
+
+#### lisp embedded
+lisp syntax is embedded between ` (% ` and `%)`
+```
+f=\x,y.x+y
+(% (f 2 3) %)
+(% (__assign__ g (__lambda__ (x y)(__add_ x y))) %)
+g(3,4)
 ```
 
 #### debug

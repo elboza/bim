@@ -55,6 +55,7 @@ newline \n
 "let"		return LET;
 "func"	return FUNC;
 "quit"		return QUIT;
+"bye"		return QUIT;
 "prn"		return PRN;
 "if"		return IF;
 "while"		return WHILE;
